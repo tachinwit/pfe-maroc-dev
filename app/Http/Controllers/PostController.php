@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+namespace App\Http\Controllers;
+
 use App\Http\Controllers\PostController;
 
 // Route pour afficher le forum
