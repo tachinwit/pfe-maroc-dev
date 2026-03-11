@@ -5,16 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Project extends Model
+class AiInteraction extends Model
 {
     protected $fillable = [
         'user_id',
-        'name',
-        'description',
-        'language',
-        'stars',
-        'github_url',
-        'homepage',
+        'user_message',
+        'ai_response',
     ];
 
     public function user(): BelongsTo

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"\n\\(Get-Acl 'app/Services/GitHubService.php'\\).Access | Select-Object IdentityReference, FileSystemRights, AccessControlType\n\" 2>&1)",
+      "Bash(powershell -Command \"Get-Item 'app/Services/GitHubService.php' | Select-Object IsReadOnly, Attributes\" 2>&1)",
+      "Bash(powershell -Command \"\nSet-ItemProperty 'app/Services/GitHubService.php' -Name IsReadOnly -Value \\\\$false\nSet-ItemProperty 'app/Http/Controllers/AIController.php' -Name IsReadOnly -Value \\\\$false\nSet-ItemProperty 'config/services.php' -Name IsReadOnly -Value \\\\$false\nSet-ItemProperty '.env.example' -Name IsReadOnly -Value \\\\$false\nWrite-Host 'ReadOnly cleared'\n\" 2>&1)",
+      "Bash(php artisan:*)",
+      "Bash(powershell -Command \"Set-ItemProperty 'app/Http/Controllers/PostController.php' -Name IsReadOnly -Value \\\\$false\" 2>&1)",
+      "Bash(powershell -Command \"Set-ItemProperty app/Http/Controllers/PostController.php -Name IsReadOnly -Value false\" 2>&1)",
+      "Bash(powershell -Command \"\n\\(Get-Item app/Http/Controllers/PostController.php\\).IsReadOnly\nattrib app/Http/Controllers/PostController.php\n\" 2>&1)",
+      "Bash(attrib -R \"app/Http/Controllers/PostController.php\" && echo \"done\")"
+    ]
+  }
+}
