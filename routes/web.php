@@ -1,24 +1,27 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\AIController;
-use App\Http\Controllers\ProjectController;
+use Inertia\Inertia;
 
-// Route pour afficher le forum
-Route::get('/forum', [PostController::class, 'index'])->name('forum.index');
-
-// Route temporaire pour l'Assistant IA
-Route::get('/assistant-ia', function () {
-    return view('assistant');
-})->name('assistant.index');
-
-// Routes protégées (utilisateur connecté requis)
-Route::middleware('auth')->group(function () {
-    // Assistant IA
-    Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');
-
-    // Vitrine Projets
-    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
-    Route::post('/projects/from-github', [ProjectController::class, 'storeFromGithub'])->name('projects.from-github');
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
 });
+
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
