@@ -1,10 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { Code2, Users, Briefcase, Calendar, MessageSquare, Sparkles } from 'lucide-react';
 
 const LandingPage = () => {
   const heroRef = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -529,8 +528,8 @@ const LandingPage = () => {
           Partagez vos projets, trouvez des opportunités et développez votre réseau professionnel.
         </p>
         <div className="hero-cta">
-          <button className="btn btn-primary" onClick={() => navigate('/profile')}>Rejoindre la Communauté</button>
-          <button className="btn btn-outline" onClick={() => navigate('/forum')}>Découvrir la Plateforme</button>
+          <button className="btn btn-primary" onClick={() => router.visit('/register')}>Rejoindre la Communauté</button>
+          <button className="btn btn-outline" onClick={() => router.visit('/forum')}>Découvrir la Plateforme</button>
         </div>
 
         <div className="code-preview">
@@ -594,7 +593,7 @@ const LandingPage = () => {
         <p>
           Créez votre profil gratuitement et commencez à collaborer avec les meilleurs développeurs du Maroc
         </p>
-        <button className="btn btn-primary cta-button" onClick={() => navigate('/profile')}>
+        <button className="btn btn-primary cta-button" onClick={() => router.visit('/register')}>
           Commencer Maintenant
         </button>
       </section>

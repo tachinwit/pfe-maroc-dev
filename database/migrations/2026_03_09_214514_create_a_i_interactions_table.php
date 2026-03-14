@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('a_i_interactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
-            $table->text('question');
-            $table->text('response');
+            $table->text('user_message');
+            $table->text('ai_response');
             $table->timestamps();
         });
     }

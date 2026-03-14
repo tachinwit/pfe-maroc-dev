@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import { 
   Send, Sparkles, Code, FileCode, Zap, Lightbulb, 
   Copy, Check, Terminal, Cpu, MessageSquare, RefreshCw
@@ -37,51 +38,28 @@ const AIAssistantPage = () => {
     { icon: <FileCode />, text: "Debug ce code : [coller ton code]" }
   ];
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMessage = { type: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input;
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await axios.post('/ai/chat', { message: currentInput });
       const aiResponse = {
         type: 'assistant',
-        content: "Voici une solution optimisée pour votre problème :",
-        code: `// Solution avec React Hooks
-import { useState, useEffect, useCallback } from 'react';
-
-function useOptimizedData(apiUrl) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(apiUrl);
-      const result = await response.json();
-      setData(result);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [apiUrl]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  return { data, loading, error, refetch: fetchData };
-}`,
-        explanation: "Ce hook personnalisé utilise useCallback pour mémoriser la fonction de fetch et éviter les re-renders inutiles. Il gère également les états de chargement et d'erreur de manière propre."
+        content: response.data.response,
       };
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      const errorMsg = error.response?.data?.error ?? 'Le service IA est temporairement indisponible.';
+      setMessages(prev => [...prev, { type: 'assistant', content: errorMsg }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const copyCode = (code, index) => {
