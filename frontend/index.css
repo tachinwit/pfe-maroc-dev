@@ -1,0 +1,39 @@
+/* ─── DevMaroc Global Styles ─────────────────────────────────────── */
+/* Always Dark Theme */
+:root {
+  --bg-main: #030712;
+  --bg-surface: rgba(255, 255, 255, 0.03);
+  --bg-navbar: rgba(15, 32, 39, 0.9);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-main: #F3F4F6;
+  --text-dim: rgba(255, 255, 255, 0.4);
+  --accent-cyan: #00D9FF;
+  --accent-indigo: #4B0082;
+  --accent-lime: #CCFF00;
+  --accent-purple: #8B5CF6;
+  --danger: #ff4d4d;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ─── Global Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+/* ─── Global Transitions ──────────────────────────────────────────── */
+a, button { transition: all 0.2s ease; }

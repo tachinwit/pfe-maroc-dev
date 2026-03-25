@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"\n\\(Get-Acl 'app/Services/GitHubService.php'\\).Access | Select-Object IdentityReference, FileSystemRights, AccessControlType\n\" 2>&1)",
+      "Bash(powershell -Command \"Get-Item 'app/Services/GitHubService.php' | Select-Object IsReadOnly, Attributes\" 2>&1)",
+      "Bash(powershell -Command \"\nSet-ItemProperty 'app/Services/GitHubService.php' -Name IsReadOnly -Value \\\\$false\nSet-ItemProperty 'app/Http/Controllers/AIController.php' -Name IsReadOnly -Value \\\\$false\nSet-ItemProperty 'config/services.php' -Name IsReadOnly -Value \\\\$false\nSet-ItemProperty '.env.example' -Name IsReadOnly -Value \\\\$false\nWrite-Host 'ReadOnly cleared'\n\" 2>&1)",
+      "Bash(php artisan:*)",
+      "Bash(powershell -Command \"Set-ItemProperty 'app/Http/Controllers/PostController.php' -Name IsReadOnly -Value \\\\$false\" 2>&1)",
+      "Bash(powershell -Command \"Set-ItemProperty app/Http/Controllers/PostController.php -Name IsReadOnly -Value false\" 2>&1)",
+      "Bash(powershell -Command \"\n\\(Get-Item app/Http/Controllers/PostController.php\\).IsReadOnly\nattrib app/Http/Controllers/PostController.php\n\" 2>&1)",
+      "Bash(attrib -R \"app/Http/Controllers/PostController.php\" && echo \"done\")",
+      "Bash(cp \"c:/Users/islil/OneDrive/Documents/PFE/pfe-maroc-dev/frontend/src/index.js\" \"c:/Users/islil/OneDrive/Documents/PFE/pfe-maroc-dev/resources/js/index.jsx\")",
+      "Bash(cp \"c:/Users/islil/OneDrive/Documents/PFE/pfe-maroc-dev/frontend/src/App.js\" \"c:/Users/islil/OneDrive/Documents/PFE/pfe-maroc-dev/resources/js/App.jsx\")",
+      "Bash(cp \"c:/Users/islil/OneDrive/Documents/PFE/pfe-maroc-dev/frontend/src/pages/\"*.jsx \"c:/Users/islil/OneDrive/Documents/PFE/pfe-maroc-dev/resources/js/pages/\")",
+      "Bash(grep -r \"useNavigate\\\\|navigate\\\\|useRouter\" resources/js/ --include=\"*.jsx\" 2>/dev/null | head -10)",
+      "Bash(wc -l /c/Users/islil/OneDrive/Documents/PFE/pfe-maroc-dev/frontend/src/pages/*.jsx 2>/dev/null)",
+      "Bash(grep -r \"@chat\\\\|@storeFromGithub\\\\|@index\" app/Http/Controllers/ --include=\"*.php\" 2>/dev/null | grep -E \"\\(function|public\\)\")",
+      "Bash(grep -r \"api/chat\\\\|/chat\\\\|POST\" resources/js --include=\"*.jsx\" 2>/dev/null | head -10)",
+      "Bash(cd \"C:\\\\Users\\\\islil\\\\OneDrive\\\\Documents\\\\PFE\\\\pfe-maroc-dev\" && php artisan config:clear && php -l app/Http/Controllers/PostController.php && php -l routes/web.php && php -l app/Models/Post.php 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\islil\\\\OneDrive\\\\Documents\\\\PFE\\\\pfe-maroc-dev\" && php -l routes/web.php && php -l app/Http/Controllers/PostController.php && php -l app/Models/Post.php && php -l database/migrations/2026_03_14_000001_rename_ai_interactions_columns.php 2>&1)"
+    ]
+  }
+}

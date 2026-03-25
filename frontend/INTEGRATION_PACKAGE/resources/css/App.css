@@ -1,0 +1,64 @@
+/* DevMaroc - Main Style System */
+
+:root {
+  --midnight: #0F2027;
+  --panel-bg: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.08);
+  --cyan: #00D9FF;
+  --purple: #8B5CF6;
+  --indigo: #4B0082;
+  --lime: #CCFF00;
+  --orange: #FF6B35;
+  --text-main: #F3F4F6;
+  --text-dim: rgba(255, 255, 255, 0.6);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--midnight);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* --- Layout (MainLayout) --- */
+.navbar { position: sticky; top: 0; z-index: 1000; background: rgba(15, 32, 39, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); box-shadow: 0 4px 30px rgba(0,0,0,0.1); }
+.nav-container { max-width: 1400px; margin: 0 auto; padding: 0.75rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-family: 'Space Mono', monospace; font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--cyan), var(--indigo)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+.nav-links { display: flex; gap: 1.2rem; align-items: center; }
+.nav-link { display: flex; align-items: center; gap: 0.4rem; color: #fff; text-decoration: none; font-weight: 600; font-size: 0.85rem; opacity: 0.7; transition: 0.3s; }
+.nav-link:hover, .nav-link.active { opacity: 1; color: var(--cyan); }
+.nav-actions { display: flex; gap: 1rem; align-items: center; }
+.points-badge { padding: .4rem 1rem; background: rgba(204, 255, 0, .1); border: 1px solid rgba(204, 255, 0, .3); border-radius: 20px; color: var(--lime); font-weight: 700; font-size: .85rem; }
+.btn-logout { padding: 0.5rem 1rem; background: rgba(255, 77, 77, 0.1); border: 1px solid rgba(255, 77, 77, 0.2); border-radius: 8px; color: #ff4d4d; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: 0.3s; }
+
+/* --- Landing Page --- */
+.hero { position: relative; max-width: 1400px; margin: 0 auto; padding: 8rem 2rem 6rem; text-align: center; z-index: 1; }
+.hero-badge { display: inline-block; padding: .5rem 1.5rem; background: rgba(0, 217, 255, .1); border: 1px solid rgba(0, 217, 255, .3); border-radius: 50px; color: var(--cyan); font-size: .85rem; font-weight: 600; margin-bottom: 2rem; letter-spacing: .05em; }
+.hero h1 { font-size: clamp(3rem, 8vw, 6rem); font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem; }
+.gradient-text { background: linear-gradient(135deg, #fff, var(--cyan), var(--indigo)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: gradientShift 3s ease infinite; }
+
+/* --- Forum --- */
+.forum-page { min-height: 100vh; padding: 2rem; }
+.forum-container { max-width: 1200px; margin: 0 auto; }
+.btn-new-thread { padding: .8rem 1.5rem; background: var(--cyan); color: #000; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: .5rem; cursor: pointer; border: none; transition: .3s; }
+.nav-chip { padding: .6rem 1.2rem; background: var(--panel-bg); border: 1px solid var(--border); border-radius: 100px; font-size: .9rem; font-weight: 600; color: var(--text-dim); cursor: pointer; transition: .3s; }
+.nav-chip.active { background: var(--cyan); color: #000; border-color: var(--cyan); }
+.thread-card { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: .3s; cursor: pointer; margin-bottom: 1rem; }
+.thread-card:hover { border-color: var(--cyan); transform: translateX(5px); }
+
+/* --- Auth Pages --- */
+.auth-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 2.5rem; width: 100%; max-width: 450px; backdrop-filter: blur(20px); }
+.u-input { background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .1); padding: .9rem 1.2rem; border-radius: 12px; color: #fff; font-size: 1rem; outline: none; width: 100%; transition: 0.3s; }
+.u-input:focus { border-color: var(--cyan); background: rgba(255, 255, 255, .08); }
+
+/* --- Profile --- */
+.profile-header { display: flex; align-items: flex-end; gap: 2.5rem; margin-bottom: 3rem; background: rgba(255,255,255,0.02); padding: 3rem; border-radius: 24px; border: 1px solid var(--border); }
+.avatar-container { width: 140px; height: 140px; border-radius: 30px; background: linear-gradient(135deg, var(--indigo), var(--cyan)); display: flex; align-items: center; justify-content: center; font-size: 4rem; box-shadow: 0 10px 40px rgba(0,217,255,0.2); }
+
+/* --- Utils --- */
+.fade-up { opacity: 0; transform: translateY(30px); transition: all .8s ease-out; }
+.fade-up.animate-in { opacity: 1; transform: translateY(0); }
+
+@keyframes gradientShift { 0%, 100% { background-position: 0% 50% } 50% { background-position: 100% 50% } }

@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Vote extends Model
+{
+    use HasFactory;
+
+    protected $casts = [
+        'type' => 'integer',
+    ];
+
+    protected $fillable = [
+        'user_id',
+        'votable_id',
+        'votable_type',
+        'type',
+    ];
+
+    public function votable()
+    {
+        return $this->morphTo();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
