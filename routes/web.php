@@ -199,8 +199,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/my-profile', [ProfileController::class, 'updateDetails'])->name('profile.updateDetails');
 
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
-    Route::post('/projects/from-github', [ProjectController::class, 'storeFromGithub'])->name('projects.store');
+    Route::get('/projects/preview', [ProjectController::class, 'preview'])->name('projects.preview');
+    Route::post('/projects/github', [ProjectController::class, 'storeFromGithub'])->name('projects.store');
     Route::post('/projects/manual', [ProjectController::class, 'storeManual'])->name('projects.storeManual');
+    Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
     Route::post('/user/{id}/follow', [ProfileController::class, 'toggleFollow'])->name('user.follow');
     Route::post('/notifications/{id}/read', [ProfileController::class, 'markNotificationAsRead'])->name('notifications.read');

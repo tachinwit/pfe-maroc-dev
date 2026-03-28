@@ -246,7 +246,7 @@ const CommentSection = ({ post }) => {
             {/* ── Liste des réponses ── */}
             {answers.length === 0 ? (
               <div className="cs-empty">
-                <div className="cs-empty-icon">💬</div>
+                <div className="cs-empty-icon"><MessageSquare size={48} /></div>
                 <p>Aucune réponse pour l'instant.</p>
                 <p style={{ marginTop: '.4rem', fontSize: '.85rem' }}>Soyez le premier à répondre !</p>
               </div>
@@ -269,7 +269,7 @@ const CommentSection = ({ post }) => {
                         <div className="answer-time">{answer.created_at_human ?? answer.created_at}</div>
                       </div>
                     </div>
-                    <span className="answer-points">⭐ {answer.user?.points ?? 0} pts</span>
+                    <span className="answer-points">{answer.user?.points ?? 0} pts</span>
                   </div>
 
                   <div className="answer-content">{answer.content}</div>

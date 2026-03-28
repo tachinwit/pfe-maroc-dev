@@ -62,11 +62,10 @@ class OpportunityController extends Controller
             $opportunity->user->notify(new \App\Notifications\NewMessageNotification($user));
         }
 
-        $user->addPoints(10);
+        // Points removed as per user request
 
         return redirect()->back()->with([
-            'success' => "Candidature envoyée à {$opportunity->company} !",
-            'points' => '+10 pts'
+            'success' => "Candidature envoyée à {$opportunity->company} !"
         ]);
     }
 }

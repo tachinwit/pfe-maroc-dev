@@ -25,7 +25,7 @@ export default function MyAnswersPage({ answers }) {
                             <Lightbulb size={48} style={{ opacity: 0.2, margin: '0 auto 1rem' }} />
                             <h3 style={{ fontSize: '1.2rem', color: 'white', marginBottom: '0.5rem' }}>Vous n'avez pas encore répondu à des questions</h3>
                             <p style={{ marginBottom: '1.5rem' }}>Partagez votre expertise et aidez la communauté !</p>
-                            <Link href="/forum" className="btn-premium" style={{ padding: '0.8rem 1.5rem' }}>Explorer le Forum</Link>
+                            <Link href="/forum" className="btn-premium" style={{ padding: '0.8rem 1.5rem' }}>Explorer la Communauté</Link>
                         </div>
                     ) : (
                         answers.map(ans => (

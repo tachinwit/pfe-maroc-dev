@@ -71,9 +71,9 @@ const Toast = ({ toast, onClose }) => {
           display: flex; align-items: flex-start; gap: 1rem;
           padding: 1.1rem 1.4rem;
           background: rgba(15,32,39,.97);
-          border: 1px solid rgba(204,255,0,.35);
+          border: 1px solid ${toast?.type === 'error' ? 'rgba(239, 68, 68, 0.35)' : 'rgba(204,255,0,0.35)'};
           border-radius: 16px;
-          box-shadow: 0 8px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(204,255,0,.1);
+          box-shadow: 0 8px 40px rgba(0,0,0,.5), 0 0 0 1px ${toast?.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(204,255,0,0.1)'};
           min-width: 260px; max-width: 340px;
           position: relative; overflow: hidden;
           backdrop-filter: blur(20px);
@@ -82,8 +82,8 @@ const Toast = ({ toast, onClose }) => {
         .toast-icon {
           width: 40px; height: 40px; flex-shrink: 0;
           border-radius: 10px;
-          background: linear-gradient(135deg, rgba(204,255,0,.2), rgba(0,217,255,.15));
-          border: 1px solid rgba(204,255,0,.3);
+          background: ${toast?.type === 'error' ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.15))' : 'linear-gradient(135deg, rgba(204,255,0,.2), rgba(0,217,255,.15))'};
+          border: 1px solid ${toast?.type === 'error' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(204,255,0,.3)'};
           display: flex; align-items: center; justify-content: center;
           animation: pop .5s ease .1s both;
         }
@@ -116,7 +116,7 @@ const Toast = ({ toast, onClose }) => {
 
         .toast-progress {
           position: absolute; bottom: 0; left: 0; height: 3px;
-          background: linear-gradient(90deg, #CCFF00, #00D9FF);
+          background: ${toast?.type === 'error' ? '#ef4444' : 'linear-gradient(90deg, #CCFF00, #00D9FF)'};
           border-radius: 0 0 16px 16px;
           animation: progress 3.5s linear forwards;
         }
@@ -125,14 +125,17 @@ const Toast = ({ toast, onClose }) => {
       <div className={`toast-wrapper ${leaving ? 'leaving' : ''}`}>
         <div className="toast-card">
           <div className="toast-icon">
-            <Star size={20} color="#CCFF00" fill="#CCFF00" />
+            {toast?.type === 'error' 
+              ? <X size={20} color="#ef4444" />
+              : <Star size={20} color="#CCFF00" fill="#CCFF00" />
+            }
           </div>
 
           <div className="toast-body">
             <div className="toast-title">
               {toast.points
                 ? <span className="toast-points">+{toast.points} points gagnés !</span>
-                : <span style={{ color: '#10B981' }}>✓ {toast.message}</span>
+                : <span style={{ color: toast?.type === 'error' ? '#ef4444' : '#10B981' }}>{toast?.type === 'error' ? '✕' : '✓'} {toast.message}</span>
               }
             </div>
             {toast.points && toast.message && (

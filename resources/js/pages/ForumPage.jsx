@@ -38,13 +38,13 @@ const ForumPage = () => {
         setShowNewPostModal(false);
         reset();
         if (page.props.flash?.success) {
-            setToast({ message: page.props.flash.success, points: page.props.flash.points || '+10 pts' });
+            setToast({ message: page.props.flash.success, points: null });
         } else {
-            setToast({ message: 'Question publiée avec succès !', points: '+10 pts' });
+            setToast({ message: 'Question publiée avec succès !', points: null });
         }
       },
       onError: () => {
-        setToast({ message: 'Erreur lors de la publication.', points: null });
+        setToast({ message: 'Erreur lors de la publication.', type: 'error', points: null });
       }
     });
   };
@@ -60,7 +60,7 @@ const ForumPage = () => {
 
   return (
     <div className="container-center" style={{ paddingTop: '2rem', paddingBottom: '4rem', maxWidth: '1000px' }}>
-      <Head title="Forum Communauté" />
+      <Head title="Communauté" />
       
       {/* New Post Modal */}
       {showNewPostModal && (
@@ -121,10 +121,10 @@ const ForumPage = () => {
       {/* Header */}
       <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
         <h1 className="section-title" style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-          Forum <span className="gradient-text">Communauté</span>
+          La <span className="gradient-text">Communauté</span>
         </h1>
         <p className="section-subtitle" style={{ maxWidth: '600px', margin: '0 auto' }}>
-          Échangez avec les meilleurs développeurs du Maroc. Posez vos questions, aidez les autres et gagnez des points.
+          Échangez avec les meilleurs développeurs du Maroc. Posez vos questions et aidez les autres.
         </p>
       </div>
 
@@ -182,7 +182,19 @@ const ForumPage = () => {
             <Link key={thread.id} href={`/forum/${thread.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
               <div className="card-premium" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'transform 0.2s, border-color 0.2s', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ flex: 1 }}>
-                  <span style={{ display: 'inline-block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--indigo)', background: 'rgba(139, 92, 246, 0.1)', padding: '0.2rem 0.6rem', borderRadius: '4px', marginBottom: '0.8rem' }}>
+                  <span style={{ 
+                    display: 'inline-block', 
+                    fontSize: '0.75rem', 
+                    fontWeight: 700, 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.05em', 
+                    color: thread.category === 'Frontend' ? '#A855F7' : (thread.category === 'Backend' ? '#3B82F6' : (thread.category === 'DevOps' ? '#10B981' : '#F43F5E')), 
+                    background: thread.category === 'Frontend' ? 'rgba(168, 85, 247, 0.15)' : (thread.category === 'Backend' ? 'rgba(59, 130, 246, 0.15)' : (thread.category === 'DevOps' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)')), 
+                    padding: '0.2rem 0.6rem', 
+                    borderRadius: '4px', 
+                    marginBottom: '0.8rem',
+                    border: `1px solid ${thread.category === 'Frontend' ? 'rgba(168, 85, 247, 0.2)' : (thread.category === 'Backend' ? 'rgba(59, 130, 246, 0.2)' : (thread.category === 'DevOps' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(244, 63, 94, 0.2)'))}`
+                  }}>
                     {thread.category}
                   </span>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.8rem', lineHeight: 1.4 }}>

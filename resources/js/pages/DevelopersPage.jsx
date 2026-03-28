@@ -4,6 +4,7 @@ import MainLayout from '../Layouts/MainLayout';
 import { Search, MapPin, Award, MessageSquare, UserPlus, UserCheck, Filter, X, Sliders, ChevronDown } from 'lucide-react';
 import SkeletonLoader from '../Components/common/SkeletonLoader';
 import Toast from '../Components/common/Toast';
+import { SKILLS_LIST, ALL_SKILLS } from '../Constants/skills';
 
   const DevelopersPage = () => {
   const { auth, developers } = usePage().props;
@@ -15,15 +16,22 @@ import Toast from '../Components/common/Toast';
   const [filterConfig, setFilterConfig] = useState({
     minPoints: 0,
     topN: 0, // 0 means all
-    sortBy: 'desc'
+    sortBy: 'desc',
+    minLevel: 'Tous'
   });
+
+  const levels = ['Tous', 'Novice', 'Débutant', 'Confirmé', 'Avancé', 'Expert'];
 
   const followingIds = auth?.following_ids || [];
   const devList = Array.isArray(developers) ? developers : [];
 
-  // Get all unique skills from all developers for the filter bar
-  const allSkills = Array.from(new Set(devList.flatMap(dev => dev.skills || []))).filter(Boolean);
-  const popularSkills = ['Tous', ...allSkills.slice(0, 10)]; // Top 10 unique skills
+  // Categorized skills for filtering
+  const skillCategories = ['Tous', ...Object.keys(SKILLS_LIST)];
+  const [activeCategory, setActiveCategory] = useState('Tous');
+  
+  const skillsToDisplay = activeCategory === 'Tous' 
+    ? ['Tous', 'JavaScript', 'Python', 'React', 'Laravel', 'PHP', 'Docker', 'AI / ML'] 
+    : ['Tous', ...SKILLS_LIST[activeCategory]];
 
   const filteredDevs = devList
     .filter(dev => {
@@ -34,8 +42,9 @@ import Toast from '../Components/common/Toast';
       
       const matchesSkill = activeSkill === 'Tous' || (dev.skills && dev.skills.includes(activeSkill));
       const matchesPoints = (dev.points || 0) >= filterConfig.minPoints;
+      const matchesLevel = filterConfig.minLevel === 'Tous' || (dev.level === filterConfig.minLevel);
 
-      return matchesSearch && matchesSkill && matchesPoints;
+      return matchesSearch && matchesSkill && matchesPoints && matchesLevel;
     })
     .sort((a, b) => {
       const order = filterConfig.sortBy === 'desc' ? -1 : 1;
@@ -53,7 +62,7 @@ import Toast from '../Components/common/Toast';
       preserveScroll: true,
       onSuccess: (page) => {
         if (page.props.flash?.success) {
-          setToast({ message: page.props.flash.success, points: '+5 pts' });
+          setToast({ message: page.props.flash.success, points: null });
         } else if (page.props.flash?.info) {
           setToast({ message: page.props.flash.info, points: null });
         } else if (page.props.flash?.message) {
@@ -98,9 +107,32 @@ import Toast from '../Components/common/Toast';
           />
         </div>
 
-        {/* Popular Skills Filter */}
-        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '800px', margin: '0 auto' }}>
-          {popularSkills.map(skill => (
+        {/* Skill Category Tabs */}
+        <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '1rem', marginBottom: '1rem', justifyContent: 'center', scrollbarWidth: 'none' }}>
+          {skillCategories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => { setActiveCategory(cat); setActiveSkill('Tous'); }}
+              style={{
+                background: activeCategory === cat ? 'rgba(255,255,255,0.1)' : 'transparent',
+                color: activeCategory === cat ? 'white' : 'var(--text-dim)',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '12px',
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Specific Skills Filter */}
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '1000px', margin: '0 auto', marginBottom: '2rem' }}>
+          {skillsToDisplay.map(skill => (
             <button
               key={skill}
               onClick={() => setActiveSkill(skill)}
@@ -108,9 +140,9 @@ import Toast from '../Components/common/Toast';
                 background: activeSkill === skill ? 'rgba(0, 217, 255, 0.15)' : 'rgba(255,255,255,0.03)',
                 color: activeSkill === skill ? 'var(--cyan)' : 'var(--text-dim)',
                 border: `1px solid ${activeSkill === skill ? 'var(--cyan)' : 'rgba(255,255,255,0.1)'}`,
-                padding: '0.5rem 1rem',
+                padding: '0.4rem 0.8rem',
                 borderRadius: '20px',
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 fontWeight: 600,
                 cursor: 'pointer',
                 transition: 'all 0.2s',
@@ -123,12 +155,12 @@ import Toast from '../Components/common/Toast';
           <button
             onClick={() => setIsFilterModalOpen(true)}
             style={{
-              background: filterConfig.minPoints > 0 || filterConfig.topN > 0 ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255,255,255,0.03)',
-              color: filterConfig.minPoints > 0 || filterConfig.topN > 0 ? '#A78BFA' : 'var(--text-dim)',
-              border: `1px solid ${filterConfig.minPoints > 0 || filterConfig.topN > 0 ? '#A78BFA' : 'rgba(255,255,255,0.1)'}`,
-              padding: '0.5rem 1rem',
+              background: filterConfig.minPoints > 0 || filterConfig.topN > 0 || filterConfig.minLevel !== 'Tous' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255,255,255,0.03)',
+              color: filterConfig.minPoints > 0 || filterConfig.topN > 0 || filterConfig.minLevel !== 'Tous' ? '#A78BFA' : 'var(--text-dim)',
+              border: `1px solid ${filterConfig.minPoints > 0 || filterConfig.topN > 0 || filterConfig.minLevel !== 'Tous' ? '#A78BFA' : 'rgba(255,255,255,0.1)'}`,
+              padding: '0.4rem 0.8rem',
               borderRadius: '20px',
-              fontSize: '0.9rem',
+              fontSize: '0.85rem',
               fontWeight: 600,
               cursor: 'pointer',
               transition: 'all 0.2s',
@@ -137,7 +169,7 @@ import Toast from '../Components/common/Toast';
               gap: '0.5rem'
             }}
           >
-            <Sliders size={14} /> Filtrer par Classement
+            <Sliders size={14} /> Filtres Avancés
           </button>
         </div>
       </div>
@@ -229,6 +261,31 @@ import Toast from '../Components/common/Toast';
             <p style={{ color: 'var(--text-dim)', marginBottom: '2rem', fontSize: '0.9rem' }}>Affinez la liste des développeurs selon leurs performances.</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+               {/* Level Filter */}
+               <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.8rem', color: 'var(--text-main)' }}>Filtrer par Niveau (Rang)</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {levels.map(level => (
+                    <button 
+                      key={level}
+                      onClick={() => setFilterConfig({...filterConfig, minLevel: level})}
+                      style={{
+                        padding: '0.5rem 0.8rem',
+                        borderRadius: '10px',
+                        border: '1px solid',
+                        borderColor: filterConfig.minLevel === level ? 'var(--cyan)' : 'rgba(255,255,255,0.1)',
+                        background: filterConfig.minLevel === level ? 'rgba(0, 217, 255, 0.1)' : 'rgba(255,255,255,0.02)',
+                        color: filterConfig.minLevel === level ? 'white' : 'var(--text-dim)',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem'
+                      }}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Min Points */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.8rem', color: 'var(--text-main)' }}>Seuil de Points Minimum</label>
@@ -236,8 +293,8 @@ import Toast from '../Components/common/Toast';
                    <input 
                     type="range" 
                     min="0" 
-                    max="2000" 
-                    step="50"
+                    max="5000" 
+                    step="100"
                     value={filterConfig.minPoints}
                     onChange={e => setFilterConfig({...filterConfig, minPoints: parseInt(e.target.value)})}
                     style={{ flex: 1, accentColor: 'var(--cyan)' }}
@@ -248,11 +305,10 @@ import Toast from '../Components/common/Toast';
                 </div>
               </div>
 
-              {/* Ranking Selection */}
-              <div>
-                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.8rem', color: 'var(--text-main)' }}>Sélection du Top</label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-                  {[0, 10, 50].map(val => (
+               <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.8rem', color: 'var(--text-main)' }}>Sélection du Classement</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+                  {[0, 3, 10, 50].map(val => (
                     <button 
                       key={val}
                       onClick={() => setFilterConfig({...filterConfig, topN: val})}
@@ -275,15 +331,49 @@ import Toast from '../Components/common/Toast';
 
               {/* Sort Order */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.8rem', color: 'var(--text-main)' }}>Ordre d'affichage</label>
-                <select 
-                  value={filterConfig.sortBy}
-                  onChange={e => setFilterConfig({...filterConfig, sortBy: e.target.value})}
-                  style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', outline: 'none' }}
-                >
-                  <option value="desc">Points décroissants (Meilleurs en premier)</option>
-                  <option value="asc">Points croissants</option>
-                </select>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.8rem', color: 'var(--text-main)' }}>Ordre des Points</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                  <button 
+                    onClick={() => setFilterConfig({...filterConfig, sortBy: 'desc'})}
+                    style={{
+                      padding: '0.8rem',
+                      borderRadius: '12px',
+                      border: '1px solid',
+                      borderColor: filterConfig.sortBy === 'desc' ? 'var(--cyan)' : 'rgba(255,255,255,0.1)',
+                      background: filterConfig.sortBy === 'desc' ? 'rgba(0, 217, 255, 0.1)' : 'rgba(255,255,255,0.02)',
+                      color: filterConfig.sortBy === 'desc' ? 'white' : 'var(--text-dim)',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.6rem',
+                      transition: '0.2s'
+                    }}
+                  >
+                    <ChevronDown size={18} /> Décroissant
+                  </button>
+                  <button 
+                    onClick={() => setFilterConfig({...filterConfig, sortBy: 'asc'})}
+                    style={{
+                      padding: '0.8rem',
+                      borderRadius: '12px',
+                      border: '1px solid',
+                      borderColor: filterConfig.sortBy === 'asc' ? 'var(--cyan)' : 'rgba(255,255,255,0.1)',
+                      background: filterConfig.sortBy === 'asc' ? 'rgba(0, 217, 255, 0.1)' : 'rgba(255,255,255,0.02)',
+                      color: filterConfig.sortBy === 'asc' ? 'white' : 'var(--text-dim)',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.6rem',
+                      transition: '0.2s'
+                    }}
+                  >
+                    <ChevronDown size={18} style={{ transform: 'rotate(180deg)' }} /> Croissant
+                  </button>
+                </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', marginTop: '1rem' }}>

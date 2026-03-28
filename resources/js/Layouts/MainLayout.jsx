@@ -47,7 +47,7 @@ export default function MainLayout({ children }) {
   // Simplified and consolidated links
   const links = [
     { href: '/',            icon: <Home size={18} />,        label: 'Accueil' },
-    { href: '/forum',       icon: <MessageSquare size={18}/>, label: 'Forum' },
+    { href: '/forum',       icon: <MessageSquare size={18}/>, label: 'Communauté' },
     { href: '/events',      icon: <Calendar size={18} />,    label: 'Événements' },
     { href: '/developers',  icon: <Users size={18} />,       label: 'Développeurs' },
   ];
@@ -131,7 +131,7 @@ export default function MainLayout({ children }) {
                       </>
                     )}
                   </div>
-                  <span className="points-badge">⭐ {auth?.user?.points ?? 0}</span>
+                  <span className="points-badge">{auth?.user?.points ?? 0} pts</span>
                   
                   <div style={{ position:'relative' }}>
                      <button 

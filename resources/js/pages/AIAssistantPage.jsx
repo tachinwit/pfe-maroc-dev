@@ -67,10 +67,19 @@ const AIAssistantPage = () => {
   };
 
   return (
-    <div className="container-center" style={{ paddingTop: '1rem', paddingBottom: '2rem', maxWidth: '1400px', height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
+    <div className="container-wide" style={{ 
+      paddingTop: '1rem', 
+      paddingBottom: '2rem', 
+      maxWidth: '1500px', 
+      margin: '0 auto',
+      width: '95%',
+      height: 'calc(100vh - 90px)', 
+      display: 'flex', 
+      flexDirection: 'column' 
+    }}>
       <Head title="Assistant IA Pro" />
       
-      <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+      <div style={{ marginBottom: '1.2rem', textAlign: 'center' }}>
         <h1 className="section-title" style={{ fontSize: '3rem', marginBottom: '0.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
           <Sparkles className="text-cyan" size={40} /> Assistant <span className="gradient-text">Expert IA</span>
         </h1>
@@ -81,10 +90,27 @@ const AIAssistantPage = () => {
         </div>
       </div>
 
-      <div className="card-premium" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0, border: '1px solid rgba(255,255,255,0.05)' }}>
+      <div className="card-premium" style={{ 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        overflow: 'hidden', 
+        padding: 0, 
+        border: '1px solid rgba(255,255,255,0.08)',
+        background: 'rgba(15, 32, 39, 0.4)',
+        backdropFilter: 'blur(20px)',
+        boxShadow: '0 30px 60px rgba(0,0,0,0.5)'
+      }}>
         
         {/* Chat Area */}
-        <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div className="custom-scrollbar" style={{ 
+          flex: 1, 
+          overflowY: 'auto', 
+          padding: '2.5rem 2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '2rem' 
+        }}>
           {messages.map((msg, idx) => (
             <div key={idx} style={{
               display: 'flex',
@@ -111,16 +137,16 @@ const AIAssistantPage = () => {
                {/* Message Content */}
                    <div style={{ maxWidth: '85%', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                   <div style={{
-                    padding: '1.5rem 2rem',
+                    padding: '1.2rem 1.8rem',
                     borderRadius: '24px',
                     borderTopLeftRadius: msg.type === 'assistant' ? 0 : '24px',
                     borderTopRightRadius: msg.type === 'user' ? 0 : '24px',
-                    background: msg.type === 'assistant' ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, var(--indigo), var(--cyan))',
-                    border: msg.type === 'assistant' ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                    background: msg.type === 'assistant' ? 'rgba(255,255,255,0.03)' : 'linear-gradient(135deg, var(--indigo), var(--cyan))',
+                    border: msg.type === 'assistant' ? '1px solid rgba(255,255,255,0.06)' : 'none',
                     color: msg.type === 'assistant' ? '#fff' : '#000',
-                    fontSize: '1.2rem', // VERY LARGE AND READABLE
-                    lineHeight: 1.8,
-                    boxShadow: msg.type === 'assistant' ? '0 10px 30px rgba(0,0,0,0.2)' : '0 10px 20px rgba(0, 217, 255, 0.2)'
+                    fontSize: '1.05rem',
+                    lineHeight: 1.7,
+                    boxShadow: msg.type === 'assistant' ? '0 10px 30px rgba(0,0,0,0.15)' : '0 10px 20px rgba(0, 217, 255, 0.2)'
                   }}>
                     {msg.content}
                   </div>
@@ -189,29 +215,34 @@ const AIAssistantPage = () => {
         </div>
 
         {/* Input Box */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '1.5rem', background: 'rgba(0,0,0,0.2)' }}>
-           <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div style={{ 
+          borderTop: '1px solid rgba(255,255,255,0.08)', 
+          padding: '1.5rem 2.5rem 2.5rem', 
+          background: 'rgba(0,0,0,0.3)' 
+        }}>
+           <div style={{ position: 'relative', display: 'flex', alignItems: 'center', maxWidth: '1000px', margin: '0 auto' }}>
              <textarea 
                value={input} 
                onChange={e => setInput(e.target.value)}
-               placeholder="Posez votre question technique ici..."
+               placeholder="Posez votre question technique ou demandez du code..."
                style={{ 
                  width: '100%', 
-                 padding: '1.5rem 5rem 1.5rem 2rem', 
-                 background: 'rgba(255,255,255,0.08)', 
-                 border: '2px solid rgba(255,255,255,0.15)', 
-                 borderRadius: '35px', 
+                 padding: '1.5rem 4.5rem 1.5rem 2rem', 
+                 background: 'rgba(255,255,255,0.04)', 
+                 border: '1px solid rgba(255,255,255,0.15)', 
+                 borderRadius: '24px', 
                  color: 'white', 
-                 fontSize: '1.25rem',
+                 fontSize: '1.1rem',
                  resize: 'none',
-                 height: '90px',
-                 lineHeight: '34px',
-                 overflow: 'hidden',
-                 boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
-                 transition: 'all 0.3s'
+                 minHeight: '80px',
+                 maxHeight: '250px',
+                 lineHeight: '1.6',
+                 boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                 outline: 'none'
                }}
-               onFocus={(e) => e.target.style.borderColor = 'var(--cyan)'}
-               onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.15)'}
+               onFocus={(e) => { e.target.style.borderColor = 'var(--cyan)'; e.target.style.background = 'rgba(255,255,255,0.06)'; }}
+               onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.15)'; e.target.style.background = 'rgba(255,255,255,0.04)'; }}
                onKeyDown={e => { if(e.key==='Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
              />
              <button 

@@ -73,14 +73,18 @@ const EventsOpportunitiesPage = () => {
       e.preventDefault();
       post('/events/create', {
           preserveScroll: true,
-          onSuccess: () => {
+          onSuccess: (page) => {
+              if (page.props.flash?.error) {
+                  setLocalToast({ message: page.props.flash.error, type: 'error', points: null });
+                  return;
+              }
               setShowCreateModal(false);
               resetForm();
-              setLocalToast({ message: 'Événement créé avec succès !', points: null });
+              setLocalToast({ message: page.props.flash?.success || 'Événement créé avec succès !', points: null });
           },
           onError: (errors) => {
               console.error("Erreur création événement:", errors);
-              setLocalToast({ message: 'Erreur lors de la création de l\'événement.', points: null });
+              setLocalToast({ message: 'Erreur lors de la création de l\'événement.', type: 'error', points: null });
           }
       });
   }
@@ -98,7 +102,7 @@ const EventsOpportunitiesPage = () => {
             setLocalToast({ message: 'Événement supprimé !', points: null });
         },
         onError: () => {
-            setLocalToast({ message: 'Erreur lors de la suppression.', points: null });
+            setLocalToast({ message: 'Erreur lors de la suppression.', type: 'error', points: null });
         }
     });
   };
@@ -114,7 +118,7 @@ const EventsOpportunitiesPage = () => {
           },
           onError: (errors) => {
               console.error("Erreur création opportunité:", errors);
-              setLocalToast({ message: 'Erreur lors de la publication.', points: null });
+              setLocalToast({ message: 'Erreur lors de la publication.', type: 'error', points: null });
           }
       });
   };
@@ -124,7 +128,7 @@ const EventsOpportunitiesPage = () => {
           preserveScroll: true,
           onSuccess: (page) => {
               if (page.props.flash?.success) {
-                  setLocalToast({ message: page.props.flash.success, points: '+10 pts' });
+                  setLocalToast({ message: page.props.flash.success, points: null });
               }
           }
       });
@@ -138,7 +142,7 @@ const EventsOpportunitiesPage = () => {
       {/* Hero Header */}
       <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
         <div style={{ display: 'inline-block', padding: '0.4rem 1rem', background: 'rgba(0, 217, 255, 0.1)', color: 'var(--cyan)', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600, marginBottom: '1.5rem', border: '1px solid rgba(0, 217, 255, 0.2)' }}>
-          🎯 NOUVELLES OPPORTUNITÉS CHAQUE JOUR
+          NOUVELLES OPPORTUNITÉS CHAQUE JOUR
         </div>
         <h1 className="section-title" style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>
           Événements & <span className="gradient-text">Opportunités</span>

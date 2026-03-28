@@ -29,6 +29,8 @@ class User extends Authenticatable
         'skills',
         'is_admin',
         'cv_path',
+        'github_url',
+        'linkedin_url',
     ];
 
     /**

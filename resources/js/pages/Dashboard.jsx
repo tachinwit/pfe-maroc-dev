@@ -26,7 +26,7 @@ const Dashboard = () => {
       <header style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 className="section-title" style={{ textAlign: 'left', fontSize: '2.5rem', marginBottom: '0.5rem' }}>
-            Bonjour, <span className="gradient-text">{user.name}</span> 👋
+            Bonjour, <span className="gradient-text">{user.name}</span>
           </h1>
           <p style={{ color: 'var(--text-dim)', fontSize: '1.1rem' }}>Voici ce qui s'est passé depuis votre dernière visite.</p>
         </div>
@@ -83,7 +83,7 @@ const Dashboard = () => {
                 <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-dim)' }}>
                     <MessageSquare size={32} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
                     <p>Aucune activité récente.</p>
-                    <Link href="/forum" className="btn-premium" style={{ marginTop: '1.5rem', padding: '0.8rem 1.5rem', fontSize: '0.9rem' }}>Participer au forum</Link>
+                    <Link href="/forum" className="btn-premium" style={{ marginTop: '1.5rem', padding: '0.8rem 1.5rem', fontSize: '0.9rem' }}>Participer à la communauté</Link>
                 </div>
               )}
             </div>
@@ -120,7 +120,7 @@ const Dashboard = () => {
 
           <section className="card-premium" style={{ background: 'linear-gradient(135deg, rgba(0,217,255,0.1), rgba(75,0,130,0.1))', borderColor: 'var(--cyan)' }}>
              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>Projets DevMaroc</h3>
-             <p style={{ color: 'var(--text-dim)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>Rejoignez un projet open-source et gagnez des points communautaires !</p>
+             <p style={{ color: 'var(--text-dim)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>Rejoignez un projet open-source et contribuez à l'écosystème !</p>
              <Link href="/events" className="btn-premium" style={{ width: '100%', display: 'block' }}>Découvrir les projets</Link>
           </section>
       </div>

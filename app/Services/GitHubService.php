@@ -31,56 +31,122 @@ class GitHubService
     }
 
     /**
-     * Parse une URL GitHub et retourne [owner, repo].
-     *
-     * @throws \InvalidArgumentException
+     * Récupère les données d'aperçu d'un dépôt ou d'un utilisateur.
      */
-    public function parseGitHubUrl(string $url): array
+    public function getPreviewData(string $url): array
     {
-        // Accepte : https://github.com/owner/repo ou https://github.com/owner/repo.git
-        $pattern = '/^https?:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+?)(\.git)?(?:\/.*)?$/';
+        $url = trim($url, '/');
+        
+        // Pattern pour User : https://github.com/username
+        // Pattern pour Repo : https://github.com/username/repo
+        $patternRepo = '/^https?:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)$/';
+        $patternUser = '/^https?:\/\/github\.com\/([a-zA-Z0-9_.-]+)$/';
 
-        if (!preg_match($pattern, trim($url), $matches)) {
-            throw new \InvalidArgumentException(
-                "L'URL fournie n'est pas une URL GitHub valide. Format attendu : https://github.com/owner/repository"
-            );
+        if (preg_match($patternRepo, $url, $matches)) {
+            return [
+                'type' => 'repo',
+                'data' => $this->getRepoInfo($url)
+            ];
         }
 
-        return [$matches[1], $matches[2]];
+        if (preg_match($patternUser, $url, $matches)) {
+            return [
+                'type' => 'user',
+                'data' => $this->getUserInfo($matches[1])
+            ];
+        }
+
+        throw new \InvalidArgumentException("URL GitHub non supportée pour l'aperçu.");
     }
 
-    /**
-     * Effectue l'appel à l'API GitHub.
-     *
-     * @throws \RuntimeException
-     */
-    private function fetchFromApi(string $owner, string $repo, string $originalUrl): array
+    public function getUserInfo(string $username): array
+    {
+        $cacheKey = "github_user_{$username}";
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($username) {
+            $response = Http::withHeaders($this->getHeaders())
+                ->withoutVerifying()
+                ->get("https://api.github.com/users/{$username}");
+
+            if ($response->failed()) {
+                throw new \RuntimeException("Utilisateur GitHub introuvable.");
+            }
+
+            $data = $response->json();
+
+            // Récupérer aussi les repos populaires
+            $reposResponse = Http::withHeaders($this->getHeaders())
+                ->withoutVerifying()
+                ->get("https://api.github.com/users/{$username}/repos?sort=updated&per_page=5");
+            
+            return [
+                'login'       => $data['login'],
+                'name'        => $data['name'] ?? $data['login'],
+                'avatar_url'  => $data['avatar_url'],
+                'bio'         => $data['bio'],
+                'location'    => $data['location'],
+                'public_repos'=> $data['public_repos'],
+                'followers'   => $data['followers'],
+                'following'   => $data['following'],
+                'html_url'    => $data['html_url'],
+                'recent_repos'=> $reposResponse->json(),
+            ];
+        });
+    }
+
+    private function getHeaders(): array
     {
         $headers = [
             'Accept'     => 'application/vnd.github.v3+json',
             'User-Agent' => 'Laravel-App',
         ];
 
-        // Optionnel : authentification pour éviter les rate limits
         $token = config('services.github.token');
         if ($token) {
             $headers['Authorization'] = "Bearer {$token}";
         }
 
-        $response = Http::withHeaders($headers)
+        return $headers;
+    }
+
+    /**
+     * Parse une URL GitHub et retourne [owner, repo].
+     */
+    public function parseGitHubUrl(string $url): array
+    {
+        $pattern = '/^https?:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+?)(\.git)?(?:\/.*)?$/';
+
+        if (!preg_match($pattern, trim($url), $matches)) {
+            throw new \InvalidArgumentException("URL non valide.");
+        }
+
+        return [$matches[1], $matches[2]];
+    }
+
+    private function fetchFromApi(string $owner, string $repo, string $originalUrl): array
+    {
+        $response = Http::withHeaders($this->getHeaders())
             ->withoutVerifying()
             ->timeout(10)
             ->get(self::API_BASE . "/{$owner}/{$repo}");
 
-        if ($response->status() === 404) {
-            throw new \RuntimeException("Le dépôt GitHub \"{$owner}/{$repo}\" est introuvable ou privé.");
-        }
-
         if ($response->failed()) {
-            throw new \RuntimeException('Impossible de contacter l\'API GitHub. Code : ' . $response->status());
+            throw new \RuntimeException('Dépôt introuvable.');
         }
 
         $data = $response->json();
+
+        // Essayer de récupérer le README (snippet)
+        $readme = "";
+        try {
+            $readmeResponse = Http::withHeaders($this->getHeaders())
+                ->withoutVerifying()
+                ->get(self::API_BASE . "/{$owner}/{$repo}/readme");
+            if ($readmeResponse->successful()) {
+                $readme = base64_decode($readmeResponse->json()['content']);
+                $readme = mb_substr($readme, 0, 1000) . '...'; // On limite pour l'aperçu
+            }
+        } catch (\Exception $e) {}
 
         return [
             'name'        => $data['name'],
@@ -92,6 +158,7 @@ class GitHubService
             'url'         => $data['html_url'],
             'homepage'    => $data['homepage'] ?? null,
             'topics'      => $data['topics'] ?? [],
+            'readme'      => $readme,
         ];
     }
 }

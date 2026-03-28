@@ -1,9 +1,4 @@
-import DangerButton from '@/Components/DangerButton';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
-import SecondaryButton from '@/Components/SecondaryButton';
-import TextInput from '@/Components/TextInput';
 import { useForm } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 
@@ -61,47 +56,45 @@ export default function DeleteUserForm({ className = '' }) {
                 Désactivation Définitive du Compte
             </button>
 
-            {confirmingUserDeletion && (
-                <div style={{ position: 'fixed', inset: 0, zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', padding: '1rem' }}>
-                    <div className="card-premium fade-up" style={{ width: '100%', maxWidth: '500px', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '2.5rem', background: '#110c0c' }}>
-                        <form onSubmit={deleteUser}>
-                            <h2 style={{ color: 'white', fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', textAlign: 'center' }}>
-                                Confirmation de <span style={{ color: '#ef4444' }}>Suppression</span>
-                            </h2>
+            <Modal show={confirmingUserDeletion} onClose={closeModal}>
+                <div className="card-premium" style={{ border: '1px solid rgba(239, 68, 68, 0.2)', padding: '2.5rem', background: '#110c0c' }}>
+                    <form onSubmit={deleteUser}>
+                        <h2 style={{ color: 'white', fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', textAlign: 'center' }}>
+                            Confirmation de <span style={{ color: '#ef4444' }}>Suppression</span>
+                        </h2>
 
-                            <p style={{ color: 'var(--text-dim)', marginBottom: '2rem', textAlign: 'center', lineHeight: 1.6 }}>
-                                Cette opération est irréversible. Pour valider la suppression de votre identité sur DevMaroc, veuillez saisir votre mot de passe actuel.
-                            </p>
+                        <p style={{ color: 'var(--text-dim)', marginBottom: '2rem', textAlign: 'center', lineHeight: 1.6 }}>
+                            Cette opération est irréversible. Pour valider la suppression de votre identité sur DevMaroc, veuillez saisir votre mot de passe actuel.
+                        </p>
 
-                            <div className="mt-6">
-                                <input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    ref={passwordInput}
-                                    value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
-                                    className="u-input"
-                                    placeholder="Mot de passe de confirmation"
-                                    style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }}
-                                    autoFocus
-                                />
-                                {errors.password && <div style={{ color: '#ef4444', marginTop: '0.5rem', fontSize: '0.875rem' }}>{errors.password}</div>}
-                            </div>
+                        <div className="mt-6">
+                            <input
+                                id="password"
+                                type="password"
+                                name="password"
+                                ref={passwordInput}
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                className="u-input"
+                                placeholder="Mot de passe de confirmation"
+                                style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }}
+                                autoFocus
+                            />
+                            {errors.password && <div style={{ color: '#ef4444', marginTop: '0.5rem', fontSize: '0.875rem' }}>{errors.password}</div>}
+                        </div>
 
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
-                                <button type="button" onClick={closeModal} className="btn-tab" style={{ flex: 1, padding: '1rem', borderRadius: '12px', fontWeight: 700 }}>
-                                    Annuler
-                                </button>
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem' }}>
+                            <button type="button" onClick={closeModal} className="btn-tab" style={{ flex: 1, padding: '1rem', borderRadius: '12px', fontWeight: 700 }}>
+                                Annuler
+                            </button>
 
-                                <button type="submit" disabled={processing} className="btn-premium" style={{ flex: 1, padding: '1rem', background: 'linear-gradient(135deg, #ef4444, #991b1b)', borderRadius: '12px', fontWeight: 800 }}>
-                                    {processing ? 'Exécution...' : 'Confirmer'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                            <button type="submit" disabled={processing} className="btn-premium" style={{ flex: 1, padding: '1rem', background: 'linear-gradient(135deg, #ef4444, #991b1b)', borderRadius: '12px', fontWeight: 800 }}>
+                                {processing ? 'Exécution...' : 'Confirmer'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            )}
+            </Modal>
         </section>
     );
 }

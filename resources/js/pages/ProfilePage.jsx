@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, MapPin, Briefcase, Github, Twitter, Linkedin, Star, Award, MessageSquare, ChevronRight, Settings, Plus, Edit3, X, Link as LinkIcon, Download, FileText } from 'lucide-react';
+import { User, Mail, MapPin, Briefcase, Github, Twitter, Linkedin, Star, Award, MessageSquare, ChevronRight, Settings, Plus, Edit3, X, Link as LinkIcon, Download, FileText, Trash2, ExternalLink } from 'lucide-react';
 import { Link, usePage, Head, router } from '@inertiajs/react';
 import MainLayout from '../Layouts/MainLayout';
 import Toast from '../Components/common/Toast';
+import GithubPreviewModal from '../Components/common/GithubPreviewModal';
+import { SKILLS_LIST, ALL_SKILLS } from '../Constants/skills';
 
 const ProfilePage = () => {
   const { auth, profileUser, projectsList, contributionsList } = usePage().props;
@@ -26,14 +28,22 @@ const ProfilePage = () => {
   // Modals state
   const [editMode, setEditMode] = useState(false);
   const [addProjectMode, setAddProjectMode] = useState(false);
+  const [githubPreviewUrl, setGithubPreviewUrl] = useState(null);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+  const [addType, setAddType] = useState('manual'); // 'manual' or 'github'
+  const [isImporting, setIsImporting] = useState(false);
   
   // Forms state
   const [editForm, setEditForm] = useState({ 
     title: profile.title || '', 
     location: profile.location || '', 
     bio: profile.bio || '',
-    skillsStr: (profile.skills || []).join(', ')
+    skills: profile.skills || [],
+    github_url: profile.github_url || '',
+    linkedin_url: profile.linkedin_url || ''
   });
+  const [skillInput, setSkillInput] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [projectForm, setProjectForm] = useState({ title: '', description: '', link: '', type: 'Project', date: '' });
 
   useEffect(() => {
@@ -41,26 +51,46 @@ const ProfilePage = () => {
       title: profile.title || '',
       location: profile.location || '',
       bio: profile.bio || '',
-      skillsStr: (profile.skills || []).join(', ')
+      skills: profile.skills || [],
+      github_url: profile.github_url || '',
+      linkedin_url: profile.linkedin_url || ''
     });
-  }, [profile.title, profile.location, profile.bio, profile.skills]);
+  }, [profile.title, profile.location, profile.bio, profile.skills, profile.github_url, profile.linkedin_url]);
 
   const handleProfileSave = (e) => {
     e.preventDefault();
-    const skillsArray = editForm.skillsStr.split(',').map(s => s.trim()).filter(Boolean);
     router.post('/my-profile', {
       title: editForm.title,
       location: editForm.location,
       bio: editForm.bio,
-      skills: skillsArray,
-      cv: editForm.cv // Add CV file
+      skills: editForm.skills,
+      cv: editForm.cv,
+      github_url: editForm.github_url,
+      linkedin_url: editForm.linkedin_url
     }, {
-      forceFormData: true, // Important for file upload
+      forceFormData: true,
       onSuccess: () => {
         setEditMode(false);
         setToast({ message: 'Profil mis à jour avec succès.', points: null });
       }
     });
+  };
+
+  const addSkill = (skill) => {
+    const s = skill.trim();
+    if (s && !editForm.skills.includes(s)) {
+      if (editForm.skills.length >= 5) {
+        setToast({ message: 'Limite de 5 compétences atteinte.', points: null });
+        return;
+      }
+      setEditForm({ ...editForm, skills: [...editForm.skills, s] });
+    }
+    setSkillInput('');
+    setShowSuggestions(false);
+  };
+
+  const removeSkill = (skillToRemove) => {
+    setEditForm({ ...editForm, skills: editForm.skills.filter(s => s !== skillToRemove) });
   };
 
   const handleProjectSave = (e) => {
@@ -75,9 +105,50 @@ const ProfilePage = () => {
       onSuccess: () => {
         setAddProjectMode(false);
         setProjectForm({ title: '', description: '', link: '', type: 'Project', date: '' });
-        setToast({ message: 'Ajouté avec succès !', points: 20 });
+        setToast({ message: 'Ajouté avec succès !', points: null });
       }
     });
+  };
+
+  const handleGithubImport = (e) => {
+    e.preventDefault();
+    if (!projectForm.link.includes('github.com')) {
+        setToast({ message: "Veuillez entrer une URL GitHub valide.", points: null });
+        return;
+    }
+    setIsImporting(true);
+    router.post('/projects/github', {
+        url: projectForm.link
+    }, {
+        onSuccess: () => {
+            setIsImporting(false);
+            setAddProjectMode(false);
+            setProjectForm({ title: '', description: '', link: '', type: 'Project', date: '' });
+            setToast({ message: 'Projet importé avec succès depuis GitHub !', points: null });
+        },
+        onError: () => {
+            setIsImporting(false);
+            setToast({ message: "Échec de l'importation. Vérifiez l'URL.", points: null });
+        }
+    });
+  };
+
+  const handleDeleteProject = () => {
+    if (!projectToDelete) return;
+    router.delete(`/projects/${projectToDelete}`, {
+        onSuccess: () => {
+            setProjectToDelete(null);
+            setToast({ message: 'Projet supprimé avec succès.', points: null });
+        }
+    });
+  };
+
+  const openGithubPreview = (e, url) => {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    setGithubPreviewUrl(url);
   };
 
   return (
@@ -108,12 +179,55 @@ const ProfilePage = () => {
                 <textarea required className="u-input" value={editForm.bio} onChange={e => setEditForm({...editForm, bio: e.target.value})} style={{ width: '100%', minHeight: '120px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white', resize: 'vertical', lineHeight: 1.6 }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Stack Technique (virgules)</label>
-                <input placeholder="React, Tailwind, Laravel, PostgreSQL..." className="u-input" value={editForm.skillsStr} onChange={e => setEditForm({...editForm, skillsStr: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }} />
+                <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Stack Technique (Compétences)</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  {editForm.skills.map(skill => (
+                    <span key={skill} style={{ background: 'rgba(0, 217, 255, 0.1)', color: 'var(--cyan)', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(0, 217, 255, 0.2)' }}>
+                      {skill}
+                      <X size={14} style={{ cursor: 'pointer' }} onClick={() => removeSkill(skill)} />
+                    </span>
+                  ))}
+                  {editForm.skills.length === 0 && <span style={{ color: 'var(--text-dim)', fontSize: '0.85rem' }}>Aucune compétence ajoutée</span>}
+                </div>
+                
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    placeholder="Ajouter une compétence (ex: React, Docker...)" 
+                    className="u-input" 
+                    value={skillInput} 
+                    onChange={e => { setSkillInput(e.target.value); setShowSuggestions(true); }}
+                    onKeyDown={e => { if(e.key === 'Enter') { e.preventDefault(); addSkill(skillInput); } }}
+                    onFocus={() => setShowSuggestions(true)}
+                    style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }} 
+                  />
+                  {showSuggestions && skillInput.length > 0 && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', marginTop: '0.5rem', zIndex: 10, maxHeight: '200px', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
+                      {ALL_SKILLS.filter(s => s.toLowerCase().includes(skillInput.toLowerCase()) && !editForm.skills.includes(s)).slice(0, 10).map(s => (
+                        <div key={s} onClick={() => addSkill(s)} style={{ padding: '0.8rem 1rem', cursor: 'pointer', transition: '0.2s' }} className="hover-bright">
+                          {s}
+                        </div>
+                      ))}
+                      <div onClick={() => addSkill(skillInput)} style={{ padding: '0.8rem 1rem', cursor: 'pointer', color: 'var(--cyan)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                        Ajouter "{skillInput}" (personnalisé)
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>URL GitHub</label>
+                    <input className="u-input" placeholder="https://github.com/..." value={editForm.github_url} onChange={e => setEditForm({...editForm, github_url: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }} />
+                </div>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>URL LinkedIn</label>
+                    <input className="u-input" placeholder="https://linkedin.com/in/..." value={editForm.linkedin_url} onChange={e => setEditForm({...editForm, linkedin_url: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }} />
+                </div>
               </div>
 
               <div style={{ padding: '1.5rem', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '16px', border: '1px dashed rgba(239, 68, 68, 0.3)' }}>
-                <label style={{ display: 'block', marginBottom: '1rem', fontSize: '1rem', color: 'white', fontWeight: 700 }}>📄 Curriculum Vitae (PDF)</label>
+                <label style={{ display: 'block', marginBottom: '1rem', fontSize: '1rem', color: 'white', fontWeight: 700 }}>Curriculum Vitae (PDF)</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <label className="btn-tab hover-scale" style={{ 
                         padding: '1rem', 
@@ -139,13 +253,13 @@ const ProfilePage = () => {
                         />
                     </label>
                     <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-dim)', textAlign: 'center' }}>
-                        {profile.cv_path ? "🚀 Un CV est déjà en ligne. Le nouveau le remplacera." : "💡 Format PDF suggéré, max 5 Mo."}
+                        {profile.cv_path ? "Un CV est déjà en ligne. Le nouveau le remplacera." : "Format PDF suggéré, max 5 Mo."}
                     </p>
                 </div>
               </div>
 
               <button className="btn-premium hover-scale" type="submit" style={{ padding: '1.2rem', marginTop: '1rem', fontSize: '1.1rem', fontWeight: 800, width: '100%', boxShadow: '0 10px 20px rgba(0,0,0,0.3)' }}>
-                🚀 SAUVEGARDER LES MODIFICATIONS
+                SAUVEGARDER LES MODIFICATIONS
               </button>
             </form>
           </div>
@@ -157,41 +271,96 @@ const ProfilePage = () => {
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(15px)', padding: '1rem' }}>
           <div className="card-premium fade-up" style={{ width: '100%', maxWidth: '600px', border: '1px solid rgba(255,255,255,0.1)', padding: 0, background: 'rgba(23, 23, 23, 0.95)' }}>
              <div style={{ padding: '2rem', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>Propulser une <span className="gradient-text">Réalisation</span></h2>
-              <button onClick={() => setAddProjectMode(false)} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', cursor: 'pointer', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={20}/></button>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>Propulser une <span className="gradient-text">Réalisation</span></h2>
+                <button onClick={() => setAddProjectMode(false)} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', cursor: 'pointer', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={20}/></button>
             </div>
-            <form onSubmit={handleProjectSave} style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Type de réalisation</label>
-                    <select value={projectForm.type} onChange={e => setProjectForm({...projectForm, type: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }}>
-                        <option value="Project" style={{color:'black'}}>🏆 Projet Technique</option>
-                        <option value="Contribution" style={{color:'black'}}>✍️ Article / Contribution</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Date de réalisation</label>
-                    <input type="text" placeholder="Jan 2024" value={projectForm.date} onChange={e => setProjectForm({...projectForm, date: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }} />
-                  </div>
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Nom du Projet / Titre</label>
-                <input required placeholder="Ex: DevMaroc Platform V2" value={projectForm.title} onChange={e => setProjectForm({...projectForm, title: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Description de l'impact</label>
-                <textarea required placeholder="Détaillez les défis techniques relevés..." value={projectForm.description} onChange={e => setProjectForm({...projectForm, description: e.target.value})} style={{ width: '100%', minHeight: '100px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white', resize: 'vertical' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Lien (GitHub, Démo, Article)</label>
-                <div style={{ position: 'relative' }}>
-                  <LinkIcon size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)' }}/>
-                  <input type="url" placeholder="https://github.com/..." value={projectForm.link} onChange={e => setProjectForm({...projectForm, link: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem 1rem 1rem 3rem', borderRadius: '12px', color: 'white' }} />
+            
+            <div style={{ padding: '1rem 2rem', display: 'flex', gap: '1rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <button 
+                    onClick={() => setAddType('manual')} 
+                    style={{ flex: 1, padding: '0.8rem', borderRadius: '12px', border: 'none', background: addType === 'manual' ? 'var(--cyan)' : 'rgba(255,255,255,0.05)', color: addType === 'manual' ? 'black' : 'white', fontWeight: 700, cursor: 'pointer', transition: '0.3s' }}
+                >
+                    Saisie Manuelle
+                </button>
+                <button 
+                    onClick={() => setAddType('github')} 
+                    style={{ flex: 1, padding: '0.8rem', borderRadius: '12px', border: 'none', background: addType === 'github' ? 'var(--cyan)' : 'rgba(255,255,255,0.05)', color: addType === 'github' ? 'black' : 'white', fontWeight: 700, cursor: 'pointer', transition: '0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                >
+                    <Github size={18}/> Import GitHub
+                </button>
+            </div>
+
+            {addType === 'manual' ? (
+                <form onSubmit={handleProjectSave} style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Type de réalisation</label>
+                        <select value={projectForm.type} onChange={e => setProjectForm({...projectForm, type: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }}>
+                            <option value="Project" style={{color:'black'}}>Projet Technique</option>
+                            <option value="Contribution" style={{color:'black'}}>Article / Contribution</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Date de réalisation</label>
+                        <input type="text" placeholder="Jan 2024" value={projectForm.date} onChange={e => setProjectForm({...projectForm, date: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }} />
+                    </div>
                 </div>
-              </div>
-              <button className="btn-premium" type="submit" style={{ padding: '1.2rem', marginTop: '1rem', fontWeight: 800, fontSize: '1rem' }}>Publier sur mon Profil</button>
-            </form>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Nom du Projet / Titre</label>
+                    <input required placeholder="Ex: DevMaroc Platform V2" value={projectForm.title} onChange={e => setProjectForm({...projectForm, title: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white' }} />
+                </div>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Description de l'impact</label>
+                    <textarea required placeholder="Détaillez les défis techniques relevés..." value={projectForm.description} onChange={e => setProjectForm({...projectForm, description: e.target.value})} style={{ width: '100%', minHeight: '100px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px', color: 'white', resize: 'vertical' }} />
+                </div>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>Lien (GitHub, Démo, Article)</label>
+                    <div style={{ position: 'relative' }}>
+                    <LinkIcon size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)' }}/>
+                    <input type="url" placeholder="https://github.com/mohssinebaraou/..." value={projectForm.link} onChange={e => setProjectForm({...projectForm, link: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem 1rem 1rem 3rem', borderRadius: '12px', color: 'white' }} />
+                    </div>
+                </div>
+                <button className="btn-premium" type="submit" style={{ padding: '1.2rem', marginTop: '1rem', fontWeight: 800, fontSize: '1rem' }}>Publier sur mon Profil</button>
+                </form>
+            ) : (
+                <form onSubmit={handleGithubImport} style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                        <Github size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
+                        <p style={{ color: 'var(--text-dim)' }}>Entrez l'URL du dépôt pour importer automatiquement toutes les informations.</p>
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>URL du Dépôt GitHub</label>
+                        <div style={{ position: 'relative' }}>
+                            <Github size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)' }}/>
+                            <input required type="url" placeholder="https://github.com/mohssinebaraou/mon-projet" value={projectForm.link} onChange={e => setProjectForm({...projectForm, link: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem 1rem 1rem 3rem', borderRadius: '12px', color: 'white' }} />
+                        </div>
+                    </div>
+                    <button disabled={isImporting} className="btn-premium" type="submit" style={{ padding: '1.2rem', fontWeight: 800, fontSize: '1rem', opacity: isImporting ? 0.7 : 1 }}>
+                        {isImporting ? 'Importation en cours...' : 'Lancer l\'importation automatique'}
+                    </button>
+                </form>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* GitHub Preview Modal */}
+      <GithubPreviewModal url={githubPreviewUrl} onClose={() => setGithubPreviewUrl(null)} />
+
+      {/* Delete Confirmation Modal */}
+      {projectToDelete && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1500, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', padding: '1rem' }}>
+            <div className="card-premium fade-up" style={{ width: '100%', maxWidth: '400px', textAlign: 'center', padding: '2rem' }}>
+                <div style={{ color: '#ef4444', marginBottom: '1.5rem' }}>
+                    <Trash2 size={48} />
+                </div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem' }}>Supprimer le projet ?</h3>
+                <p style={{ color: 'var(--text-dim)', marginBottom: '2rem' }}>Cette action est irréversible. Voulez-vous vraiment continuer ?</p>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button onClick={() => setProjectToDelete(null)} className="btn-tab" style={{ flex: 1, padding: '1rem' }}>Annuler</button>
+                    <button onClick={handleDeleteProject} className="btn-premium" style={{ flex: 1, padding: '1rem', background: 'linear-gradient(135deg, #ef4444, #991b1b)' }}>Supprimer</button>
+                </div>
+            </div>
         </div>
       )}
 
@@ -243,14 +412,14 @@ const ProfilePage = () => {
                 
                 <div style={{ display: 'flex', gap: '2rem', marginTop: '2rem', color: 'var(--text-dim)', fontSize: '1rem', flexWrap: 'wrap' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 1rem', borderRadius: '12px' }}><MapPin size={18} color="#06B6D4" /> {profile.location}</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(204, 255, 0, 0.05)', padding: '0.5rem 1rem', borderRadius: '12px', color: '#CCFF00', fontWeight: 700 }}><Star size={18} /> {profile.points} XP Total</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(204, 255, 0, 0.05)', padding: '0.5rem 1rem', borderRadius: '12px', color: '#CCFF00', fontWeight: 700 }}><Star size={18} /> {profile.points} pts</span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(139, 92, 246, 0.05)', padding: '0.5rem 1rem', borderRadius: '12px', color: '#A78BFA', fontWeight: 700 }}><Award size={18} /> Rang : {profile.level || 'Expert Tier'}</span>
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '0.8rem' }}>
-                  <a href="#" className="hover-scale" style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}><Github size={22}/></a>
-                  <a href="#" className="hover-scale" style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0A66C2', border: '1px solid rgba(255,255,255,0.1)' }}><Linkedin size={22}/></a>
+                  <button onClick={(e) => openGithubPreview(e, profile.github_url || 'https://github.com/mohssinebaraou')} className="hover-scale" style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }}><Github size={22}/></button>
+                  <a href={profile.linkedin_url || "#"} target={profile.linkedin_url ? "_blank" : "_self"} className="hover-scale" style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0A66C2', border: '1px solid rgba(255,255,255,0.1)' }}><Linkedin size={22}/></a>
               </div>
            </div>
         </div>
@@ -274,7 +443,7 @@ const ProfilePage = () => {
             <section>
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                  <h2 style={{ fontSize: '1.75rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                   ⚡ Réalisations <span style={{ fontSize: '1rem', color: 'var(--text-dim)', background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.8rem', borderRadius: '10px' }}>{projects.length + contributions.length}</span>
+                   Réalisations <span style={{ fontSize: '1rem', color: 'var(--text-dim)', background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.8rem', borderRadius: '10px' }}>{projects.length + contributions.length}</span>
                  </h2>
                  {isOwner && (
                    <button onClick={() => setAddProjectMode(true)} className="btn-premium hover-scale" style={{ padding: '0.7rem 1.5rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.6rem', borderRadius: '14px' }}>
@@ -304,13 +473,23 @@ const ProfilePage = () => {
                               
                               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                 {(p.github_url || p.link) && (
-                                    <a href={p.github_url || p.link} target="_blank" rel="noreferrer" className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.2rem', borderRadius: '12px', fontSize: '0.9rem', textDecoration: 'none' }}>
+                                    <button onClick={(e) => openGithubPreview(e, p.github_url || p.link)} className="btn-outline hover-bright" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.2rem', borderRadius: '12px', fontSize: '0.9rem', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
                                         <Github size={16}/> Voir Source
-                                    </a>
+                                    </button>
                                 )}
                                 <a href="#" style={{ color: 'var(--text-dim)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none' }}>
                                     <MessageSquare size={16}/> {Math.floor(Math.random() * 10)} commentaires
                                 </a>
+                                
+                                {isOwner && (
+                                    <button 
+                                       onClick={() => setProjectToDelete(p.id)} 
+                                       style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'rgba(239, 68, 68, 0.5)', cursor: 'pointer', transition: '0.2s' }} 
+                                       title="Supprimer ce projet"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                )}
                               </div>
                             </div>
                             <div style={{ width: '80px', height: '80px', borderRadius: '16px', background: 'rgba(255,255,255,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -328,11 +507,22 @@ const ProfilePage = () => {
                          </div>
                          <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '0.8rem' }}>{c.name || c.title}</h3>
                          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1rem', marginBottom: '1.5rem' }}>{c.description || 'Contribution active aux échanges communautaires.'}</p>
-                         {(c.github_url || c.link) && (
-                            <a href={c.github_url || c.link} target="_blank" rel="noreferrer" style={{ color: 'var(--cyan)', fontWeight: 700, fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-                                <LinkIcon size={16}/> Consulter la publication
-                            </a>
-                         )}
+                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            {(c.github_url || c.link) && (
+                               <button onClick={(e) => openGithubPreview(e, c.github_url || c.link)} style={{ color: 'var(--cyan)', fontWeight: 700, fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+                                   <LinkIcon size={16}/> Consulter la publication
+                               </button>
+                            )}
+                            {isOwner && (
+                               <button 
+                                  onClick={() => setProjectToDelete(c.id)} 
+                                  style={{ background: 'none', border: 'none', color: 'rgba(239, 68, 68, 0.5)', cursor: 'pointer' }}
+                                  title="Supprimer cette contribution"
+                               >
+                                   <Trash2 size={18} />
+                               </button>
+                            )}
+                         </div>
                       </div>
                     ))}
                    </>

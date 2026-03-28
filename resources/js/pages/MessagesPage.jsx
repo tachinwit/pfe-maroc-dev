@@ -168,7 +168,7 @@ export default function MessagesPage({ auth, contacts, activeUserId, activeChat 
                                 <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }} className="hide-scroll">
                                     {activeChat.length === 0 ? (
                                         <div style={{ textAlign: 'center', margin: 'auto', color: 'var(--text-dim)' }}>
-                                            Dites bonjour à {activeContact?.name} ! 👋
+                                            Dites bonjour à {activeContact?.name} !
                                         </div>
                                     ) : (
                                         activeChat.map((msg) => {

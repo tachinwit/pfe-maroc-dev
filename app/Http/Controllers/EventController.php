@@ -20,6 +20,16 @@ class EventController extends Controller
             'location' => 'required|string|max:255',
         ]);
 
+        // Empêcher les doublons (même date, même lieu, même type)
+        $exists = \App\Models\Event::where('date', $request->date)
+            ->where('location', $request->location)
+            ->where('type', $request->type)
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()->with('error', 'Cet événement existe déjà avec la même date, le même lieu et le même concept.');
+        }
+
         Event::create([
             'title' => $request->title,
             'type' => $request->type,

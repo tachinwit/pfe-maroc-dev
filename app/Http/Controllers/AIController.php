@@ -45,12 +45,10 @@ class AIController extends Controller
             'ai_response'   => $aiResponse,
         ]);
 
-        // Récompense de points (+5 pour interaction IA)
-        $user->rewardForAiInteraction();
+        // Interaction recorded, no points awarded per user request
 
         return response()->json([
             'response'    => $aiResponse,
-            'points_earned' => 5,
             'total_points'  => $user->fresh()->points,
         ]);
     }

@@ -60,11 +60,11 @@ class PostController extends Controller
             'category' => $request->category,
         ]);
 
-        $request->user()->rewardForForumPost();
+        // $request->user()->rewardForForumPost();
 
         return redirect()->back()->with([
             'success' => 'Question publiée avec succès !',
-            'points' => '+10 pts'
+            'points' => null
         ]);
     }
 
@@ -85,12 +85,12 @@ class PostController extends Controller
             $post->user->notify(new \App\Notifications\NewCommentNotification($post, $request->user()));
         }
 
-        // Reward for comment
-        $request->user()->addPoints(5);
+        // Reward for comment removed per user request
+        // $request->user()->addPoints(5);
 
         return redirect()->back()->with([
             'success' => 'Réponse publiée !',
-            'points' => '+5 pts'
+            'points' => null
         ]);
     }
 
@@ -110,7 +110,7 @@ class PostController extends Controller
         $comment->update(['is_best_answer' => true]);
 
         if ($comment->user) {
-            $comment->user->addPoints(20);
+            // $comment->user->addPoints(\App\Traits\PointsConfig::BEST_ANSWER);
         }
 
         return redirect()->back()->with([

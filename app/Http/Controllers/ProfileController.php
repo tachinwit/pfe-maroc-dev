@@ -70,21 +70,40 @@ class ProfileController extends Controller
             'bio'      => 'nullable|string',
             'title'    => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
-            'skills'   => 'nullable|array',
+            'skills'   => 'nullable|array|max:5',
             'skills.*' => 'string|max:50',
             'cv'       => 'nullable|file|mimes:pdf|max:5120', // Max 5MB PDF
+            'avatar'   => 'nullable|image|max:2048', // Max 2MB Image
+            'cover'    => 'nullable|image|max:5120', // Max 5MB Image
+            'github_url'   => 'nullable|url|max:255',
+            'linkedin_url' => 'nullable|url|max:255',
         ]);
 
         $user = $request->user();
-        $data = $request->only('bio', 'title', 'location', 'skills');
+        $data = $request->only('bio', 'title', 'location', 'skills', 'github_url', 'linkedin_url');
 
+        // Handle CV
         if ($request->hasFile('cv')) {
-            // Delete old CV if exists
             if ($user->cv_path) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->cv_path);
             }
-            $path = $request->file('cv')->store('cvs', 'public');
-            $data['cv_path'] = $path;
+            $data['cv_path'] = $request->file('cv')->store('cvs', 'public');
+        }
+
+        // Handle Avatar
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar_path);
+            }
+            $data['avatar_path'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        // Handle Cover
+        if ($request->hasFile('cover')) {
+            if ($user->cover_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->cover_path);
+            }
+            $data['cover_path'] = $request->file('cover')->store('covers', 'public');
         }
 
         $user->update($data);
@@ -108,14 +127,13 @@ class ProfileController extends Controller
             $authUser->following()->attach($userToFollow->id);
             
             if (method_exists($authUser, 'addPoints')) {
-                $authUser->addPoints(5);
+                // Points removed as per user request
             }
 
             $userToFollow->notify(new \App\Notifications\NewFollowerNotification($authUser));
             
             return back()->with([
-                'success' => 'Abonnement réussi !',
-                'points' => '+5 pts'
+                'success' => 'Abonnement réussi !'
             ]);
         }
     }

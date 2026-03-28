@@ -61,7 +61,7 @@ trait HasPoints
         return match(true) {
             $this->points >= 1000 => 'Expert',
             $this->points >= 500  => 'Avancé',
-            $this->points >= 200  => 'Intermédiaire',
+            $this->points >= 200  => 'Confirmé',
             $this->points >= 50   => 'Débutant',
             default               => 'Novice',
         };

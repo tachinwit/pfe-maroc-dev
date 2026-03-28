@@ -15,7 +15,7 @@ export default function PostDetailsPage({ post, auth }) {
   const handleVote = (e, type, id, value) => {
     if (isVoting) return;
     if (!auth.user) {
-      setToast({ message: 'Veuillez vous connecter pour voter.', points: null });
+      setToast({ message: 'Veuillez vous connecter pour voter.', type: 'error', points: null });
       return;
     }
     
@@ -59,20 +59,20 @@ export default function PostDetailsPage({ post, auth }) {
       onSuccess: (page) => {
         reset();
         if (page.props.flash?.success) {
-            setToast({ message: page.props.flash.success, points: page.props.flash.points || '+5 pts' });
+            setToast({ message: page.props.flash.success, points: null });
         } else {
-            setToast({ message: 'Réponse ajoutée avec succès !', points: '+5 pts' });
+            setToast({ message: 'Réponse ajoutée avec succès !', points: null });
         }
       },
       onError: () => {
-        setToast({ message: 'Erreur lors de l\'envoi de la réponse.', points: null });
+        setToast({ message: 'Erreur lors de l\'envoi de la réponse.', type: 'error', points: null });
       }
     });
   };
 
   return (
     <MainLayout>
-      <Head title={`${post.title} - Forum`} />
+      <Head title={`${post.title} - Communauté`} />
       
       {toast && <Toast message={toast.message} points={toast.points} onClose={() => setToast(null)} />}
 
@@ -80,13 +80,21 @@ export default function PostDetailsPage({ post, auth }) {
         
         {/* Back Button */}
         <Link href="/forum" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--cyan)', textDecoration: 'none', marginBottom: '2rem', fontWeight: 600, transition: '0.3s' }} className="hover-bright">
-          <ArrowLeft size={18} /> Retour au forum
+          <ArrowLeft size={18} /> Retour à la communauté
         </Link>
         
         {/* Original Post */}
         <div className="card-premium" style={{ marginBottom: '2rem', padding: '2rem', border: '1px solid rgba(0, 217, 255, 0.2)', background: 'linear-gradient(to bottom, rgba(15,23,42,0.8), rgba(15,23,42,0.4))' }}>
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-            <span style={{ padding: '0.3rem 0.8rem', background: 'rgba(0, 217, 255, 0.1)', color: 'var(--cyan)', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span style={{ 
+              padding: '0.3rem 0.8rem', 
+              background: post.category === 'Frontend' ? 'rgba(168, 85, 247, 0.15)' : (post.category === 'Backend' ? 'rgba(59, 130, 246, 0.15)' : (post.category === 'DevOps' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)')), 
+              color: post.category === 'Frontend' ? '#A855F7' : (post.category === 'Backend' ? '#3B82F6' : (post.category === 'DevOps' ? '#10B981' : '#F43F5E')), 
+              borderRadius: '20px', 
+              fontSize: '0.8rem', 
+              fontWeight: 700,
+              border: `1px solid ${post.category === 'Frontend' ? 'rgba(168, 85, 247, 0.2)' : (post.category === 'Backend' ? 'rgba(59, 130, 246, 0.2)' : (post.category === 'DevOps' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(244, 63, 94, 0.2)'))}`
+            }}>
               {post.category || 'Général'}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-dim)', fontSize: '0.85rem' }}>

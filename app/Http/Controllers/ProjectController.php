@@ -36,34 +36,37 @@ class ProjectController extends Controller
             'github_url.regex'    => 'L\'URL doit pointer vers un dépôt GitHub valide (ex: https://github.com/owner/repo).',
         ]);
 
+        $url = $request->github_url ?? $request->url;
+        
+        if (!$url) {
+            return redirect()->back()->withErrors(['url' => 'L\'URL GitHub est requise.']);
+        }
+
         $user = $request->user();
 
         // Vérifier les doublons
-        $existingProject = Project::where('user_id', $user->id)
-            ->where('github_url', $request->github_url)
-            ->first();
+        $exists = Project::where('user_id', $user->id)
+            ->where('github_url', $url)
+            ->exists();
 
-        if ($existingProject) {
-            return response()->json([
-                'error'   => 'Vous avez déjà ajouté ce projet.',
-                'project' => $existingProject,
-            ], 409);
+        if ($exists) {
+            return redirect()->back()->withErrors(['url' => 'Ce projet est déjà dans votre portfolio.']);
         }
 
         try {
-            $repoInfo = $this->githubService->getRepoInfo($request->github_url);
+            $repoInfo = $this->githubService->getRepoInfo($url);
         } catch (\InvalidArgumentException $e) {
-            return response()->json(['error' => $e->getMessage()], 422);
+            return redirect()->back()->withErrors(['url' => $e->getMessage()]);
         } catch (\RuntimeException $e) {
             Log::warning('GitHub API fetch failed', [
-                'url'   => $request->github_url,
+                'url'   => $url,
                 'error' => $e->getMessage(),
             ]);
-            return response()->json(['error' => $e->getMessage()], 502);
+            return redirect()->back()->withErrors(['url' => "Impossible de récupérer les infos depuis GitHub."]);
         }
 
         // Création du projet en base de données
-        $project = Project::create([
+        Project::create([
             'user_id'     => $user->id,
             'name'        => $repoInfo['name'],
             'description' => $repoInfo['description'],
@@ -73,15 +76,7 @@ class ProjectController extends Controller
             'homepage'    => $repoInfo['homepage'],
         ]);
 
-        // Récompense de points (+20 pour partage de projet)
-        $user->rewardForProjectShare();
-
-        return response()->json([
-            'message'       => 'Projet ajouté avec succès !',
-            'project'       => $project,
-            'points_earned' => 20,
-            'total_points'  => $user->fresh()->points,
-        ], 201);
+        return redirect()->back()->with('success', 'Projet importé avec succès !');
     }
 
     /**
@@ -122,8 +117,40 @@ class ProjectController extends Controller
             'project_date' => $request->project_date,
         ]);
 
-        $request->user()->rewardForProjectShare();
+        // $request->user()->rewardForProjectShare();
 
         return redirect()->back();
+    }
+
+    /**
+     * Supprime un projet de l'utilisateur.
+     */
+    public function destroy(Request $request, $id)
+    {
+        $project = Project::findOrFail($id);
+
+        if ($project->user_id !== $request->user()->id) {
+            abort(403, "Vous n'êtes pas autorisé à supprimer ce projet.");
+        }
+
+        $project->delete();
+
+        return redirect()->back()->with('success', 'Projet supprimé avec succès.');
+    }
+
+    /**
+     * API pour l'explorateur GitHub (V2)
+     */
+    public function preview(Request $request): JsonResponse
+    {
+        $url = $request->query('url');
+        if (!$url) return response()->json(['error' => 'URL requise'], 400);
+
+        try {
+            $data = $this->githubService->getPreviewData($url);
+            return response()->json($data);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
     }
 }

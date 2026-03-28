@@ -21,7 +21,7 @@ const LandingPage = () => {
 
   const features = [
     { icon: <Code2 className="w-8 h-8"/>,        title: "Collaboration Open-Source",  description: "Créez et contribuez à des projets avec la communauté marocaine" },
-    { icon: <MessageSquare className="w-8 h-8"/>, title: "Forum d'Entraide",          description: "Posez vos questions et partagez vos connaissances techniques" },
+    { icon: <MessageSquare className="w-8 h-8"/>, title: "Communauté d'Entraide",    description: "Posez vos questions et partagez vos connaissances techniques" },
     { icon: <Briefcase className="w-8 h-8"/>,    title: "Opportunités Pro",            description: "Découvrez des stages et missions freelance adaptés à vos compétences" },
     { icon: <Calendar className="w-8 h-8"/>,     title: "Événements Tech",             description: "Participez aux hackathons, meetups et workshops locaux" },
     { icon: <Users className="w-8 h-8"/>,        title: "Réseau Professionnel",        description: "Développez votre portfolio et connectez avec d'autres devs" },
@@ -62,7 +62,7 @@ const LandingPage = () => {
           ) : (
             <>
               <Link href="/register" className="btn-premium" style={{ minWidth: '200px' }}>Rejoindre la Communauté</Link>
-              <Link href="/forum" className="btn-outline" style={{ padding: '1rem 2rem', borderRadius: '12px', fontWeight: 700 }}>Explorer le Forum</Link>
+              <Link href="/forum" className="btn-outline" style={{ padding: '1rem 2rem', borderRadius: '12px', fontWeight: 700 }}>Explorer la Communauté</Link>
             </>
           )}
         </div>

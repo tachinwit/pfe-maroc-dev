@@ -49,21 +49,18 @@ class VoteController extends Controller
             'type' => $request->vote_type,
         ]);
 
-        // ONLY award points for a NEW vote to prevent spam/abuse
-        $request->user()->addPoints(2);
+        // No points awarded for participation to prevent abuse
+        // $request->user()->addPoints(2);
 
-        // Award points to the AUTHOR if it was an upvote (+2 for balance)
+        // Notify author if upvoted
         if ($request->vote_type == 1 && $model->user) {
-            $model->user->addPoints(2);
             return redirect()->back()->with([
-                'success' => 'Vote enregistré ! (+2 pts pour vous, +2 pts pour l\'auteur)',
-                'points' => '+2 pts'
+                'success' => 'Vote enregistré !',
             ]);
         }
 
         return redirect()->back()->with([
-            'success' => 'Vote enregistré ! (+2 pts pour votre participation)',
-            'points' => '+2 pts'
+            'success' => 'Vote enregistré !',
         ]);
     }
 }
