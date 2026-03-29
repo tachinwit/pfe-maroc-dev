@@ -59,6 +59,16 @@ const DevelopersPage = () => {
     }
   };
 
+  const getRankBadge = (points) => {
+    if (points > 150) {
+      return { text: 'Expert', className: 'text-yellow-400 bg-yellow-400/10' };
+    } else if (points >= 50) {
+      return { text: 'Intermédiaire', className: 'text-blue-400 bg-blue-400/10' };
+    } else {
+      return { text: 'Novice', className: 'text-gray-400 bg-gray-400/10' };
+    }
+  };
+
   const currentLeaderboard = leaderboard?.[leaderboardType] || {};
   const currentUserRank = currentLeaderboard.current_user_rank;
 
@@ -99,7 +109,7 @@ const DevelopersPage = () => {
                 </div>
                 <div className="podium-info">
                   <h4>{entry.user.name}</h4>
-                  <span className={`level-badge ${getLevelColor(entry.level)}`}>{entry.level}</span>
+                  <span className={`level-badge ${getRankBadge(entry.total_points).className}`}>{getRankBadge(entry.total_points).text}</span>
                   <div className="podium-points">
                     {leaderboardType === 'monthly' ? (
                       <>
@@ -138,7 +148,7 @@ const DevelopersPage = () => {
                   <div className="user-avatar-small avatar-placeholder">{entry.user.name[0]}</div>
                   <div className="user-info">
                     <span className="user-name">{entry.user.name}</span>
-                    <span className="user-title">{entry.user.title || 'Développeur'}</span>
+                    <span className={`level-badge ${getRankBadge(entry.total_points).className}`}>{getRankBadge(entry.total_points).text}</span>
                   </div>
                 </Link>
               </div>

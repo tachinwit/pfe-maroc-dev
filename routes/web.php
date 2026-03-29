@@ -119,27 +119,87 @@ Route::get('/developers', function () {
     $month = 3;
 
     $monthlyTopThree = \App\Models\MonthlyPoint::getTopThree($year, $month);
+    $isMonthlyGlobal = $monthlyTopThree->count() === 0;
+
+    // FALLBACK: Si monthly_points vide, utiliser le classement global
+    if ($isMonthlyGlobal) {
+        $monthlyTopThree = \App\Models\User::orderBy('points', 'desc')
+            ->limit(3)
+            ->get()
+            ->map(function($user, $index) {
+                return [
+                    'user' => $user,
+                    'points_earned' => 0,
+                    'total_points' => $user->points,
+                    'level' => $user->level,
+                    'rank' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉'),
+                    'medal' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉')
+                ];
+            });
+    } else {
+        $monthlyTopThree = $monthlyTopThree->map(function($monthlyPoint, $index) {
+            return [
+                'user' => $monthlyPoint->user,
+                'points_earned' => $monthlyPoint->points_earned,
+                'total_points' => $monthlyPoint->total_points,
+                'level' => $monthlyPoint->user->level,
+                'rank' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉'),
+                'medal' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉')
+            ];
+        });
+    }
+
     $monthlyLeaderboard = \App\Models\MonthlyPoint::getMonthlyLeaderboard($year, $month, 20);
+    
+    // FALLBACK: Si leaderboard mensuel vide, utiliser le global
+    if ($monthlyLeaderboard->count() === 0) {
+        $monthlyLeaderboard = \App\Models\User::orderBy('points', 'desc')
+            ->limit(20)
+            ->get()
+            ->map(function($user, $index) {
+                return [
+                    'rank' => $index + 1,
+                    'user' => $user,
+                    'points_earned' => 0,
+                    'total_points' => $user->points,
+                    'level' => $user->level
+                ];
+            });
+    } else {
+        $monthlyLeaderboard = $monthlyLeaderboard->map(function($monthlyPoint, $index) {
+            return [
+                'rank' => $index + 1,
+                'user' => $monthlyPoint->user,
+                'points_earned' => $monthlyPoint->points_earned,
+                'total_points' => $monthlyPoint->total_points,
+                'level' => $monthlyPoint->user->level
+            ];
+        });
+    }
 
     // Position de l'utilisateur actuel pour le mois
     $currentUserMonthlyRank = null;
     if (auth()->check()) {
-        $userMonthly = \App\Models\MonthlyPoint::where('user_id', auth()->id())
-            ->where('year', $year)
-            ->where('month', $month)
-            ->first();
-
-        if ($userMonthly) {
-            $rank = \App\Models\MonthlyPoint::where('year', $year)
+        if (!$isMonthlyGlobal) {
+            $userMonthly = \App\Models\MonthlyPoint::where('user_id', auth()->id())
+                ->where('year', $year)
                 ->where('month', $month)
-                ->where('points_earned', '>', $userMonthly->points_earned)
-                ->orWhere(function($query) use ($userMonthly) {
-                    $query->where('points_earned', $userMonthly->points_earned)
-                          ->where('total_points', '>', $userMonthly->total_points);
-                })
-                ->count();
+                ->first();
 
-            $currentUserMonthlyRank = $rank + 1;
+            if ($userMonthly) {
+                $rank = \App\Models\MonthlyPoint::where('year', $year)
+                    ->where('month', $month)
+                    ->where('points_earned', '>', $userMonthly->points_earned)
+                    ->orWhere(function($query) use ($userMonthly) {
+                        $query->where('points_earned', $userMonthly->points_earned)
+                              ->where('total_points', '>', $userMonthly->total_points);
+                    })
+                    ->count();
+
+                $currentUserMonthlyRank = $rank + 1;
+            }
+        } else {
+            $currentUserMonthlyRank = \App\Models\User::where('points', '>', auth()->user()->points)->count() + 1;
         }
     }
 
@@ -154,7 +214,11 @@ Route::get('/developers', function () {
     }
 
     // Statistiques
-    $monthlyStats = [
+    $monthlyStats = $isMonthlyGlobal ? [
+        'total_participants' => \App\Models\User::count(),
+        'total_points_awarded' => \App\Models\User::sum('points'),
+        'average_points' => round(\App\Models\User::avg('points') ?? 0, 1)
+    ] : [
         'total_participants' => \App\Models\MonthlyPoint::where('year', $year)->where('month', $month)->count(),
         'total_points_awarded' => \App\Models\MonthlyPoint::where('year', $year)->where('month', $month)->sum('points_earned'),
         'average_points' => round(\App\Models\MonthlyPoint::where('year', $year)->where('month', $month)->avg('points_earned') ?? 0, 1)
@@ -170,25 +234,8 @@ Route::get('/developers', function () {
         'developers' => $developers,
         'leaderboard' => [
             'monthly' => [
-                'top_three' => $monthlyTopThree->map(function($monthlyPoint, $index) {
-                    return [
-                        'user' => $monthlyPoint->user,
-                        'points_earned' => $monthlyPoint->points_earned,
-                        'total_points' => $monthlyPoint->total_points,
-                        'level' => $monthlyPoint->user->level,
-                        'rank' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉'),
-                        'medal' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉')
-                    ];
-                }),
-                'leaderboard' => $monthlyLeaderboard->map(function($monthlyPoint, $index) {
-                    return [
-                        'rank' => $index + 1,
-                        'user' => $monthlyPoint->user,
-                        'points_earned' => $monthlyPoint->points_earned,
-                        'total_points' => $monthlyPoint->total_points,
-                        'level' => $monthlyPoint->user->level
-                    ];
-                }),
+                'top_three' => $monthlyTopThree,
+                'leaderboard' => $monthlyLeaderboard,
                 'current_user_rank' => $currentUserMonthlyRank,
                 'stats' => $monthlyStats,
                 'current_month' => [

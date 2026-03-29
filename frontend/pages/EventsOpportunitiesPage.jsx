@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Link, usePage, Head } from '@inertiajs/react';
 import MainLayout from '../Layouts/MainLayout';
-import { Calendar, Briefcase, MapPin, Clock, Users, Tag, Search, ExternalLink, PlusCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Calendar, Briefcase, MapPin, Clock, Users, Tag, Search, ExternalLink, PlusCircle, CheckCircle2, ArrowRight, Code } from 'lucide-react';
 
 /**
  * EventsOpportunitiesPage - Displays upcoming events and job opportunities.
  * Features tab switching and client-side filtering.
  */
 const EventsOpportunitiesPage = () => {
-  const { events, opportunities } = usePage().props;
+  const { events_db, opportunities_db } = usePage().props;
   const [activeTab, setActiveTab] = useState('events');
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,13 +21,13 @@ const EventsOpportunitiesPage = () => {
     { id: 'Conférence', name: 'Conférences' },
   ];
 
-  const filteredEvents = (events ?? []).filter(e => {
+  const filteredEvents = (events_db ?? []).filter(e => {
     const matchType = selectedFilter === 'all' || e.type === selectedFilter;
     const matchSearch = !searchQuery || e.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchType && matchSearch;
   });
 
-  const filteredOpps = (opportunities ?? []).filter(o =>
+  const filteredOpps = (opportunities_db ?? []).filter(o =>
     !searchQuery || o.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     o.company?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -86,11 +86,8 @@ const EventsOpportunitiesPage = () => {
             <div className="events-grid">
               {filteredEvents.map(event => (
                 <div key={event.id} className={`event-card ${event.featured?'featured':''}`}>
-                  <div className="event-image-container">
-                    {event.image
-                      ? <img src={event.image} alt={event.title} className="event-image"/>
-                      : <div className="event-image-placeholder"/>
-                    }
+                  <div className="h-48 bg-gradient-to-br from-indigo-500 to-emerald-500 flex items-center justify-center rounded-t-lg relative">
+                    <Code size={64} className="text-white" />
                     <div className="event-type-badge">{event.type}</div>
                   </div>
                   <div className="event-content">

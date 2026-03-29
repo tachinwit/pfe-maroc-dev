@@ -19,41 +19,24 @@ class LeaderboardController extends Controller
 
         // Top 3 du mois
         $topThree = MonthlyPoint::getTopThree($year, $month);
+        $isGlobal = $topThree->count() === 0;
 
-        // Classement complet (top 20)
-        $leaderboard = MonthlyPoint::getMonthlyLeaderboard($year, $month, 20);
-
-        // Position de l'utilisateur actuel
-        $currentUserRank = null;
-        if (auth()->check()) {
-            $userMonthly = MonthlyPoint::where('user_id', auth()->id())
-                ->where('year', $year)
-                ->where('month', $month)
-                ->first();
-
-            if ($userMonthly) {
-                $rank = MonthlyPoint::where('year', $year)
-                    ->where('month', $month)
-                    ->where('points_earned', '>', $userMonthly->points_earned)
-                    ->orWhere(function($query) use ($userMonthly) {
-                        $query->where('points_earned', $userMonthly->points_earned)
-                              ->where('total_points', '>', $userMonthly->total_points);
-                    })
-                    ->count();
-
-                $currentUserRank = $rank + 1;
-            }
-        }
-
-        // Statistiques du mois
-        $monthlyStats = [
-            'total_participants' => MonthlyPoint::where('year', $year)->where('month', $month)->count(),
-            'total_points_awarded' => MonthlyPoint::where('year', $year)->where('month', $month)->sum('points_earned'),
-            'average_points' => round(MonthlyPoint::where('year', $year)->where('month', $month)->avg('points_earned') ?? 0, 1)
-        ];
-
-        return Inertia::render('Leaderboard/Index', [
-            'topThree' => $topThree->map(function($monthlyPoint) {
+        // Fallback: si monthly_points vide, utiliser le classement global
+        if ($isGlobal) {
+            $topThree = User::orderBy('points', 'desc')
+                ->limit(3)
+                ->get()
+                ->map(function($user, $index) {
+                    return [
+                        'user' => $user,
+                        'points_earned' => 0,
+                        'total_points' => $user->points,
+                        'level' => $user->level,
+                        'rank' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉')
+                    ];
+                });
+        } else {
+            $topThree = $topThree->map(function($monthlyPoint) {
                 return [
                     'user' => $monthlyPoint->user,
                     'points_earned' => $monthlyPoint->points_earned,
@@ -62,8 +45,28 @@ class LeaderboardController extends Controller
                     'rank' => $monthlyPoint->user->level === 'Expert' ? '🥇' :
                              ($monthlyPoint->user->level === 'Avancé' ? '🥈' : '🥉')
                 ];
-            }),
-            'leaderboard' => $leaderboard->map(function($monthlyPoint, $index) {
+            });
+        }
+
+        // Classement complet (top 20)
+        $leaderboard = MonthlyPoint::getMonthlyLeaderboard($year, $month, 20);
+
+        // Fallback: si leaderboard mensuel vide, utiliser global
+        if ($leaderboard->count() === 0) {
+            $leaderboard = User::orderBy('points', 'desc')
+                ->limit(20)
+                ->get()
+                ->map(function($user, $index) {
+                    return [
+                        'rank' => $index + 1,
+                        'user' => $user,
+                        'points_earned' => 0,
+                        'total_points' => $user->points,
+                        'level' => $user->level
+                    ];
+                });
+        } else {
+            $leaderboard = $leaderboard->map(function($monthlyPoint, $index) {
                 return [
                     'rank' => $index + 1,
                     'user' => $monthlyPoint->user,
@@ -71,9 +74,52 @@ class LeaderboardController extends Controller
                     'total_points' => $monthlyPoint->total_points,
                     'level' => $monthlyPoint->user->level
                 ];
-            }),
+            });
+        }
+
+        // Position de l'utilisateur actuel
+        $currentUserRank = null;
+        if (auth()->check()) {
+            if (!$isGlobal) {
+                $userMonthly = MonthlyPoint::where('user_id', auth()->id())
+                    ->where('year', $year)
+                    ->where('month', $month)
+                    ->first();
+
+                if ($userMonthly) {
+                    $rank = MonthlyPoint::where('year', $year)
+                        ->where('month', $month)
+                        ->where('points_earned', '>', $userMonthly->points_earned)
+                        ->orWhere(function($query) use ($userMonthly) {
+                            $query->where('points_earned', $userMonthly->points_earned)
+                                  ->where('total_points', '>', $userMonthly->total_points);
+                        })
+                        ->count();
+
+                    $currentUserRank = $rank + 1;
+                }
+            } else {
+                $currentUserRank = User::where('points', '>', auth()->user()->points)->count() + 1;
+            }
+        }
+
+        // Statistiques du mois
+        $monthlyStats = $isGlobal ? [
+            'total_participants' => User::count(),
+            'total_points_awarded' => User::sum('points'),
+            'average_points' => round(User::avg('points') ?? 0, 1)
+        ] : [
+            'total_participants' => MonthlyPoint::where('year', $year)->where('month', $month)->count(),
+            'total_points_awarded' => MonthlyPoint::where('year', $year)->where('month', $month)->sum('points_earned'),
+            'average_points' => round(MonthlyPoint::where('year', $year)->where('month', $month)->avg('points_earned') ?? 0, 1)
+        ];
+
+        return Inertia::render('Leaderboard/Index', [
+            'topThree' => $topThree,
+            'leaderboard' => $leaderboard,
             'currentUserRank' => $currentUserRank,
             'monthlyStats' => $monthlyStats,
+            'isGlobal' => $isGlobal,
             'currentMonth' => [
                 'year' => $year,
                 'month' => $month,
