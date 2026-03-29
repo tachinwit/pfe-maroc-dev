@@ -190,6 +190,7 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Nous recrutons un Senior React Developer pour rejoindre notre équipe. 5+ ans d\'expérience requise.',
                 'type' => 'CDD',
                 'location' => 'Casablanca, Maroc',
+                'user_id' => 1,
             ],
             [
                 'title' => 'DevOps Engineer - AWS Specialist',
@@ -197,6 +198,7 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Rejoignez notre équipe DevOps! Expertise AWS et Kubernetes requise.',
                 'type' => 'CDI',
                 'location' => 'Fès, Maroc',
+                'user_id' => 2,
             ],
             [
                 'title' => 'Full Stack Developer - Freelance',
@@ -204,6 +206,7 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Plusieurs missions disponibles en freelance. React + Node.js.',
                 'type' => 'Freelance',
                 'location' => 'Remote',
+                'user_id' => 3,
             ],
             [
                 'title' => 'Data Scientist',
@@ -211,6 +214,7 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Opportunité pour analyser des données et créer des modèles ML.',
                 'type' => 'CDI',
                 'location' => 'Marrakech, Maroc',
+                'user_id' => 4,
             ],
             [
                 'title' => 'Flutter Mobile Developer',
@@ -218,6 +222,7 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Développez des applications mobiles innovantes avec Flutter.',
                 'type' => 'CDD',
                 'location' => 'Agadir, Maroc',
+                'user_id' => 5,
             ],
         ];
 
