@@ -85,28 +85,15 @@ class SocialiteController extends Controller
                 Log::info('Existing user updated', ['user_id' => $user->id]);
             }
 
-            // Générer et stocker un code OTP en base de données
-            $otpRecord = OtpCode::generate($user, $user->email);
-            $otpCode = $otpRecord->code;
+            // Connexion directe de l'utilisateur (one-click) après validation Google
+            Auth::login($user);
 
-            // Envoyer le code OTP par email
-            try {
-                Mail::to($user->email)->send(new OtpMail($user, $otpCode));
-                Log::info('OTP email sent successfully', ['to' => $user->email]);
-            } catch (\Exception $mailError) {
-                Log::error('Failed to send OTP email', ['error' => $mailError->getMessage()]);
-            }
-
-            // TEMPORAIRE: code OTP dans les logs pour faciliter les tests (supprimer en production)
-            Log::info("OTP Code for {$user->email}: {$otpCode}");
-
-            Log::info('Redirecting to OTP page...', ['user_id' => $user->id]);
-
-            return redirect()->route('auth.verify-otp')->with([
-                'email'     => $user->email,
-                'message'   => 'Un code de vérification a été envoyé à votre email.',
-
+            Log::info('User logged in via Google OAuth', [
+                'user_id' => $user->id,
+                'email' => $user->email,
             ]);
+
+            return redirect('/dashboard')->with('success', 'Connexion réussie ! Bienvenue sur MarocDev.');
 
         } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
             Log::error('OAuth InvalidStateException — session perdue entre redirect et callback', [

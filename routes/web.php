@@ -110,10 +110,116 @@ Route::get('/my-answers', function (\Illuminate\Http\Request $request) {
     ]);
 })->middleware(['auth', 'verified'])->name('my-answers');
 
-Route::get('/developers', function () { 
+Route::get('/developers', function () {
+    // Données des développeurs
+    $developers = \App\Models\User::orderBy('points', 'desc')->get();
+
+    // Données du leaderboard mensuel (par défaut mars 2026)
+    $year = 2026;
+    $month = 3;
+
+    $monthlyTopThree = \App\Models\MonthlyPoint::getTopThree($year, $month);
+    $monthlyLeaderboard = \App\Models\MonthlyPoint::getMonthlyLeaderboard($year, $month, 20);
+
+    // Position de l'utilisateur actuel pour le mois
+    $currentUserMonthlyRank = null;
+    if (auth()->check()) {
+        $userMonthly = \App\Models\MonthlyPoint::where('user_id', auth()->id())
+            ->where('year', $year)
+            ->where('month', $month)
+            ->first();
+
+        if ($userMonthly) {
+            $rank = \App\Models\MonthlyPoint::where('year', $year)
+                ->where('month', $month)
+                ->where('points_earned', '>', $userMonthly->points_earned)
+                ->orWhere(function($query) use ($userMonthly) {
+                    $query->where('points_earned', $userMonthly->points_earned)
+                          ->where('total_points', '>', $userMonthly->total_points);
+                })
+                ->count();
+
+            $currentUserMonthlyRank = $rank + 1;
+        }
+    }
+
+    // Données du leaderboard global
+    $globalTopThree = \App\Models\User::orderBy('points', 'desc')->limit(3)->get();
+    $globalLeaderboard = \App\Models\User::orderBy('points', 'desc')->limit(20)->get();
+
+    // Position de l'utilisateur actuel global
+    $currentUserGlobalRank = null;
+    if (auth()->check()) {
+        $currentUserGlobalRank = \App\Models\User::where('points', '>', auth()->user()->points)->count() + 1;
+    }
+
+    // Statistiques
+    $monthlyStats = [
+        'total_participants' => \App\Models\MonthlyPoint::where('year', $year)->where('month', $month)->count(),
+        'total_points_awarded' => \App\Models\MonthlyPoint::where('year', $year)->where('month', $month)->sum('points_earned'),
+        'average_points' => round(\App\Models\MonthlyPoint::where('year', $year)->where('month', $month)->avg('points_earned') ?? 0, 1)
+    ];
+
+    $globalStats = [
+        'total_participants' => \App\Models\User::count(),
+        'total_points_all_time' => \App\Models\User::sum('points'),
+        'average_points' => round(\App\Models\User::avg('points') ?? 0, 1)
+    ];
+
     return Inertia::render('DevelopersPage', [
-        'developers' => \App\Models\User::orderBy('points', 'desc')->get()
-    ]); 
+        'developers' => $developers,
+        'leaderboard' => [
+            'monthly' => [
+                'top_three' => $monthlyTopThree->map(function($monthlyPoint, $index) {
+                    return [
+                        'user' => $monthlyPoint->user,
+                        'points_earned' => $monthlyPoint->points_earned,
+                        'total_points' => $monthlyPoint->total_points,
+                        'level' => $monthlyPoint->user->level,
+                        'rank' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉'),
+                        'medal' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉')
+                    ];
+                }),
+                'leaderboard' => $monthlyLeaderboard->map(function($monthlyPoint, $index) {
+                    return [
+                        'rank' => $index + 1,
+                        'user' => $monthlyPoint->user,
+                        'points_earned' => $monthlyPoint->points_earned,
+                        'total_points' => $monthlyPoint->total_points,
+                        'level' => $monthlyPoint->user->level
+                    ];
+                }),
+                'current_user_rank' => $currentUserMonthlyRank,
+                'stats' => $monthlyStats,
+                'current_month' => [
+                    'year' => $year,
+                    'month' => $month,
+                    'name' => now()->setYear($year)->setMonth($month)->format('F Y')
+                ]
+            ],
+            'global' => [
+                'top_three' => $globalTopThree->map(function($user, $index) {
+                    return [
+                        'user' => $user,
+                        'total_points' => $user->points,
+                        'level' => $user->level,
+                        'rank' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉'),
+                        'medal' => $index === 0 ? '🥇' : ($index === 1 ? '🥈' : '🥉')
+                    ];
+                }),
+                'leaderboard' => $globalLeaderboard->map(function($user, $index) {
+                    return [
+                        'rank' => $index + 1,
+                        'user' => $user,
+                        'total_points' => $user->points,
+                        'level' => $user->level
+                    ];
+                }),
+                'current_user_rank' => $currentUserGlobalRank,
+                'stats' => $globalStats
+            ]
+        ]
+    ]);
 })->name('developers');
 
 // Auth protected routes
@@ -237,6 +343,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/messages/{id}', [\App\Http\Controllers\MessageController::class, 'update'])->name('messages.update');
     Route::delete('/messages/{id}', [\App\Http\Controllers\MessageController::class, 'destroy'])->name('messages.destroy');
     Route::delete('/messages/conversation/{userId}', [\App\Http\Controllers\MessageController::class, 'destroyConversation'])->name('messages.destroyConversation');
+
+    // Leaderboard routes
+    Route::get('/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard.index');
+    Route::get('/api/leaderboard', [\App\Http\Controllers\LeaderboardController::class, 'api'])->name('leaderboard.api');
 });
 
 require __DIR__.'/auth.php';

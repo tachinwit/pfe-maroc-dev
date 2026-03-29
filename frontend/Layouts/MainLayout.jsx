@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import { 
   Home, Users, MessageSquare, Calendar, Sparkles, 
-  Menu, X, LayoutDashboard, LogOut, User, Bell 
+  Menu, X, LayoutDashboard, LogOut, User, Bell, Trophy
 } from 'lucide-react';
 
 const ThemeContext = createContext();
@@ -54,7 +54,8 @@ export default function MainLayout({ children }) {
 
   if (!isGuest) {
     links.splice(1, 0, { href: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard' });
-    links.splice(3, 0, { href: '/profile', icon: <User size={18} />, label: 'Profil' });
+    links.splice(2, 0, { href: '/leaderboard', icon: <Trophy size={18} />, label: 'Classement' });
+    links.splice(4, 0, { href: '/profile', icon: <User size={18} />, label: 'Profil' });
     links.push({ href: '/ai-assistant', icon: <Sparkles size={18} />, label: 'Assistant IA' });
   }
 

@@ -39,7 +39,7 @@ class ProjectController extends Controller
         $url = $request->github_url ?? $request->url;
         
         if (!$url) {
-            return redirect()->back()->withErrors(['url' => 'L\'URL GitHub est requise.']);
+            return response()->json(['message' => 'L\'URL GitHub est requise.'], 422);
         }
 
         $user = $request->user();
@@ -50,23 +50,23 @@ class ProjectController extends Controller
             ->exists();
 
         if ($exists) {
-            return redirect()->back()->withErrors(['url' => 'Ce projet est déjà dans votre portfolio.']);
+            return response()->json(['message' => 'Ce projet est déjà dans votre portfolio.'], 409);
         }
 
         try {
             $repoInfo = $this->githubService->getRepoInfo($url);
         } catch (\InvalidArgumentException $e) {
-            return redirect()->back()->withErrors(['url' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 422);
         } catch (\RuntimeException $e) {
             Log::warning('GitHub API fetch failed', [
                 'url'   => $url,
                 'error' => $e->getMessage(),
             ]);
-            return redirect()->back()->withErrors(['url' => "Impossible de récupérer les infos depuis GitHub."]);
+            return response()->json(['message' => "Impossible de récupérer les infos depuis GitHub."], 500);
         }
 
         // Création du projet en base de données
-        Project::create([
+        $project = Project::create([
             'user_id'     => $user->id,
             'name'        => $repoInfo['name'],
             'description' => $repoInfo['description'],
@@ -76,7 +76,10 @@ class ProjectController extends Controller
             'homepage'    => $repoInfo['homepage'],
         ]);
 
-        return redirect()->back()->with('success', 'Projet importé avec succès !');
+        return response()->json([
+            'message' => 'Projet importé avec succès !',
+            'project' => $project
+        ], 201);
     }
 
     /**

@@ -103,6 +103,11 @@ class PostController extends Controller
             abort(403);
         }
 
+        // Prevent marking own comment as best answer
+        if ($comment->user_id === $request->user()->id) {
+            return redirect()->back()->with('error', 'Vous ne pouvez pas marquer votre propre commentaire comme meilleure réponse.');
+        }
+
         if ($post->comments()->where('is_best_answer', true)->exists()) {
             return redirect()->back()->with('error', 'Une meilleure réponse a déjà été choisie.');
         }

@@ -22,6 +22,9 @@ trait HasPoints
     public function addPoints(int $amount): void
     {
         $this->increment('points', $amount);
+
+        // Mettre à jour les points mensuels
+        \App\Models\MonthlyPoint::addPointsForUser($this, $amount);
     }
 
     /**

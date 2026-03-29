@@ -64,26 +64,5 @@ Route::middleware('auth')->group(function () {
         ->name('logout');
 });
 
-// OTP Verification routes (accessible pendant le processus d'authentification)
-Route::middleware('web')->group(function () {
-    Route::get('auth/verify-otp', function () {
-        // Si déjà connecté, rediriger vers dashboard
-        if (auth()->check()) {
-            return redirect('/dashboard');
-        }
+// OTP Verification routes (ancienne logique MFA) supprimée pour One-Click Google.
 
-        // Récupérer les données flash de la session
-        $email = session('email');
-        $message = session('message');
-        $debugOtp = session('debug_otp');
-
-        return Inertia::render('Auth/VerifyOtp', [
-            'email' => $email,
-            'message' => $message,
-            'debug_otp' => $debugOtp,
-        ]);
-    })->name('auth.verify-otp');
-
-    Route::post('auth/verify-otp', [SocialiteController::class, 'verifyOtp']);
-    Route::post('auth/resend-otp', [SocialiteController::class, 'resendOtp']);
-});

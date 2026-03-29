@@ -182,7 +182,7 @@ export default function MessagesPage({ auth, contacts, activeUserId, activeChat 
                                                     onMouseEnter={() => setHoveredMessageId(msg.id)}
                                                     onMouseLeave={() => setHoveredMessageId(null)}
                                                 >
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: isMe ? 'row' : 'row-reverse' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flexDirection: isMe ? 'row' : 'row-reverse' }}>
                                                         {isMe && hoveredMessageId === msg.id && !isEditing && (
                                                             <div style={{ display: 'flex', gap: '5px' }}>
                                                                 <button onClick={() => { setEditingMessageId(msg.id); setEditContent(msg.content); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-dim)', padding: '5px' }} className="hover-bright"><Edit2 size={14} /></button>
@@ -205,7 +205,8 @@ export default function MessagesPage({ auth, contacts, activeUserId, activeChat 
                                                             </div>
                                                         ) : (
                                                             <div style={{ 
-                                                                maxWidth: '75%', 
+                                                                display: 'inline-block',
+                                                                maxWidth: '70%',
                                                                 padding: '0.8rem 1.2rem', 
                                                                 borderRadius: '16px',
                                                                 borderBottomRightRadius: isMe ? '4px' : '16px',
@@ -214,7 +215,9 @@ export default function MessagesPage({ auth, contacts, activeUserId, activeChat 
                                                                 color: isMe ? '#000' : 'white',
                                                                 border: isMe ? 'none' : '1px solid rgba(255,255,255,0.1)',
                                                                 fontWeight: 500,
-                                                                wordBreak: 'break-word'
+                                                                whiteSpace: 'normal',
+                                                                wordWrap: 'break-word',
+                                                                overflowWrap: 'break-word'
                                                             }}>
                                                                 {msg.content}
                                                             </div>

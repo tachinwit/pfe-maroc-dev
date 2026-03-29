@@ -372,32 +372,33 @@ const ProfilePage = () => {
       )}
 
       {/* Header Profile Advanced Design */}
-      <div className="card-premium" style={{ display: 'flex', flexDirection: 'column', padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '3rem', borderRadius: '24px', position: 'relative' }}>
-        {/* Cover Background with dynamic patterns */}
-        <div style={{ height: '220px', background: 'linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)', position: 'relative', overflow: 'hidden' }}>
+      <div className="card-premium" style={{ display: 'flex', flexDirection: 'column', padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '3rem', borderRadius: '28px', position: 'relative' }}>
+        {/* Premium Cover Background with gradient animation */}
+        <div style={{ height: '260px', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.8) 0%, rgba(6, 182, 212, 0.6) 50%, rgba(139, 92, 246, 0.8) 100%)', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
-            <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '300px', height: '300px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%', blur: '40px' }}></div>
+            <div style={{ position: 'absolute', top: '-150px', right: '-100px', width: '400px', height: '400px', background: 'rgba(255,255,255,0.08)', borderRadius: '50%' }}></div>
+            <div style={{ position: 'absolute', bottom: '-100px', left: '-100px', width: '350px', height: '350px', background: 'rgba(0,217,255,0.1)', borderRadius: '50%' }}></div>
         </div>
         
         {/* Profile Content */}
         <div style={{ padding: '0 3rem 2.5rem 3rem', position: 'relative' }}>
-           {/* Avatar / Photo with Premium Glow */}
-           <div style={{ width: '160px', height: '160px', borderRadius: '40px', background: 'var(--midnight)', padding: '8px', position: 'absolute', top: '-80px', left: '3rem', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', transform: 'rotate(-3deg)' }}>
-              <div style={{ width: '100%', height: '100%', borderRadius: '32px', background: 'linear-gradient(135deg, #06B6D4, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4.5rem', fontWeight: 900, color: 'white', textShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+           {/* Avatar with Premium Glow and Status Badge */}
+           <div style={{ width: '180px', height: '180px', borderRadius: '48px', background: 'var(--midnight)', padding: '6px', position: 'absolute', top: '-90px', left: '3rem', boxShadow: '0 30px 60px rgba(0, 217, 255, 0.2), 0 0 40px rgba(139, 92, 246, 0.1)', border: '2px solid rgba(0, 217, 255, 0.3)' }}>
+              <div style={{ width: '100%', height: '100%', borderRadius: '40px', background: 'linear-gradient(135deg, #06B6D4 0%, #8B5CF6 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem', fontWeight: 900, color: 'white' }}>
                  {profile.name[0].toUpperCase()}
               </div>
-              <div style={{ position: 'absolute', bottom: '-10px', right: '-10px', background: '#CCFF00', color: 'black', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', transform: 'rotate(10deg)', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>PRO</div>
+              <div style={{ position: 'absolute', bottom: '-8px', right: '-8px', background: 'linear-gradient(135deg, #CCFF00, #00D9FF)', color: '#000', width: '50px', height: '50px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.8rem', boxShadow: '0 8px 24px rgba(204, 255, 0, 0.3)', border: '2px solid var(--midnight)' }}>⭐</div>
            </div>
 
            {/* Actions / Meta Top */}
-           <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '1.5rem', minHeight: '80px', gap: '1rem' }}>
+           <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '2rem', minHeight: '100px', gap: '1rem' }}>
               {isOwner ? (
                 <>
-                    <Link href="/settings" className="btn-outline hover-scale" style={{ borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', padding: '0.8rem 1.5rem', fontWeight: 600, display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'white' }}>
-                        <Settings size={18} style={{ marginRight: '0.5rem' }}/> Paramètres
+                    <Link href="/settings" className="btn-outline hover-scale" style={{ borderRadius: '16px', border: '1px solid rgba(255,255,255,0.15)', padding: '0.9rem 1.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'white', background: 'rgba(255,255,255,0.03)', transition: 'all 0.3s' }}>
+                        <Settings size={18} style={{ marginRight: '0.6rem' }}/> Paramètres
                     </Link>
-                    <button onClick={() => setEditMode(true)} className="btn-premium" style={{ borderRadius: '16px', padding: '0.8rem 1.5rem', fontWeight: 700 }}>
-                        <Edit3 size={18} style={{ marginRight: '0.5rem' }}/> Éditer le Profil
+                    <button onClick={() => setEditMode(true)} className="btn-premium" style={{ borderRadius: '16px', padding: '0.9rem 1.8rem', fontWeight: 700 }}>
+                        <Edit3 size={18} style={{ marginRight: '0.6rem' }}/> Éditer le Profil
                     </button>
                 </>
               ) : (
@@ -409,24 +410,28 @@ const ProfilePage = () => {
               )}
            </div>
 
-           <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '2rem' }}>
+           <div style={{ marginTop: '3rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'flex-start' }}>
               <div>
-                <h1 style={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, marginBottom: '0.5rem' }}>{profile.name}</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                    <div style={{ height: '2px', width: '30px', background: 'var(--cyan)' }}></div>
-                    <p style={{ color: 'var(--cyan)', fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>{profile.title}</p>
+                <h1 style={{ fontSize: '3.5rem', fontWeight: 950, letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '0.8rem', background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(0,217,255,0.8) 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{profile.name}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '2rem' }}>
+                    <div style={{ height: '3px', width: '40px', background: 'linear-gradient(90deg, var(--cyan), var(--lime))', borderRadius: '2px' }}></div>
+                    <p style={{ color: 'var(--cyan)', fontSize: '1.4rem', fontWeight: 700, margin: 0 }}>{profile.title}</p>
                 </div>
                 
-                <div style={{ display: 'flex', gap: '2rem', marginTop: '2rem', color: 'var(--text-dim)', fontSize: '1rem', flexWrap: 'wrap' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(255,255,255,0.03)', padding: '0.5rem 1rem', borderRadius: '12px' }}><MapPin size={18} color="#06B6D4" /> {profile.location}</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(204, 255, 0, 0.05)', padding: '0.5rem 1rem', borderRadius: '12px', color: '#CCFF00', fontWeight: 700 }}><Star size={18} /> {profile.points} pts</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(139, 92, 246, 0.05)', padding: '0.5rem 1rem', borderRadius: '12px', color: '#A78BFA', fontWeight: 700 }}><Award size={18} /> Rang : {profile.level || 'Expert Tier'}</span>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(0,217,255,0.1)', padding: '0.8rem 1.2rem', borderRadius: '14px', border: '1px solid rgba(0,217,255,0.2)', fontSize: '0.95rem' }}><MapPin size={18} color="#06B6D4" /> {profile.location}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(204, 255, 0, 0.1)', padding: '0.8rem 1.2rem', borderRadius: '14px', border: '1px solid rgba(204,255,0,0.2)', color: '#CCFF00', fontWeight: 700, fontSize: '0.95rem' }}><Star size={18} /> {profile.points} pts</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(139, 92, 246, 0.1)', padding: '0.8rem 1.2rem', borderRadius: '14px', border: '1px solid rgba(139,92,246,0.2)', color: '#A78BFA', fontWeight: 700, fontSize: '0.95rem' }}><Award size={18} /> {profile.level || 'Expert'}</span>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.8rem' }}>
-                  <button onClick={(e) => openProjectViewer(e, { title: 'Profil GitHub', github_url: profile.github_url || 'https://github.com/mohssinebaraou' })} className="hover-scale" style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }}><Github size={22}/></button>
-                  <a href={profile.linkedin_url || "#"} target={profile.linkedin_url ? "_blank" : "_self"} className="hover-scale" style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0A66C2', border: '1px solid rgba(255,255,255,0.1)' }}><Linkedin size={22}/></a>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                  <button onClick={(e) => openProjectViewer(e, { title: 'Profil GitHub', github_url: profile.github_url || 'https://github.com/mohssinebaraou' })} className="hover-scale" style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', border: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer', transition: 'all 0.3s' }} title="GitHub Profile">
+                    <Github size={24}/>
+                  </button>
+                  <a href={profile.linkedin_url || "#"} target={profile.linkedin_url ? "_blank" : "_self"} className="hover-scale" style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0A66C2', border: '1px solid rgba(255,255,255,0.15)', transition: 'all 0.3s' }} title="LinkedIn">
+                    <Linkedin size={24}/>
+                  </a>
               </div>
            </div>
         </div>
@@ -437,64 +442,69 @@ const ProfilePage = () => {
          {/* Main Activity Area */}
          <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
             
-            {/* Bio with Modern Typography */}
-            <section className="card-premium" style={{ borderRadius: '24px', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, right: 0, padding: '2rem', opacity: 0.03 }}><User size={120} /></div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            {/* Bio with Premium Typography */}
+            <section className="card-premium" style={{ borderRadius: '24px', position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(0, 217, 255, 0.05), rgba(139, 92, 246, 0.05))' }}>
+              <div style={{ position: 'absolute', top: -40, right: -40, opacity: 0.05 }}><User size={200} /></div>
+              <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.8rem', position: 'relative', zIndex: 1 }}>
+                <div style={{ width: '4px', height: '32px', background: 'linear-gradient(180deg, var(--cyan), var(--lime))', borderRadius: '2px' }}></div>
                 Manifeste <span className="gradient-text">Technique</span>
               </h2>
-              <p style={{ fontSize: '1.15rem', lineHeight: 1.8, color: 'rgba(255,255,255,0.8)', fontWeight: 400 }}>{profile.bio}</p>
+              <p style={{ fontSize: '1.2rem', lineHeight: 1.9, color: 'rgba(255,255,255,0.85)', fontWeight: 400, position: 'relative', zIndex: 1 }}>{profile.bio}</p>
             </section>
 
             {/* Projects & Contributions Re-Designed */}
             <section>
-               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                 <h2 style={{ fontSize: '1.75rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                   Réalisations <span style={{ fontSize: '1rem', color: 'var(--text-dim)', background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.8rem', borderRadius: '10px' }}>{projects.length + contributions.length}</span>
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+                 <h2 style={{ fontSize: '2rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '1rem', margin: 0 }}>
+                   <Briefcase size={32} style={{ color: 'var(--cyan)' }}/>
+                   Réalisations 
+                   <span style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.5)', background: 'rgba(0,217,255,0.1)', padding: '0.4rem 1rem', borderRadius: '12px', border: '1px solid rgba(0,217,255,0.2)', fontWeight: 700 }}>{projects.length + contributions.length}</span>
                  </h2>
                  {isOwner && (
-                   <button onClick={() => setAddProjectMode(true)} className="btn-premium hover-scale" style={{ padding: '0.7rem 1.5rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.6rem', borderRadius: '14px' }}>
-                     <Plus size={18}/> Nouvelle Réalisation
+                   <button onClick={() => setAddProjectMode(true)} className="btn-premium hover-scale" style={{ padding: '0.9rem 1.8rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.6rem', borderRadius: '16px', fontWeight: 700 }}>
+                     <Plus size={20}/> Nouvelle Réalisations
                    </button>
                  )}
                </div>
 
-               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                  {(projects.length === 0 && contributions.length === 0) ? (
-                   <div className="card-premium" style={{ textAlign: 'center', padding: '4rem 2rem', borderDash: '2px solid rgba(255,255,255,0.1)' }}>
-                      <Briefcase size={40} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-                      <p style={{ color: 'var(--text-dim)', fontSize: '1.1rem' }}>Pas encore de projets partagés. C'est le moment de briller !</p>
+                   <div className="card-premium" style={{ textAlign: 'center', padding: '5rem 2rem', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(0,217,255,0.05), rgba(139,92,246,0.05))', border: '2px dashed rgba(255,255,255,0.1)' }}>
+                      <Briefcase size={48} style={{ opacity: 0.2, marginBottom: '1.5rem' }} />
+                      <p style={{ color: 'var(--text-dim)', fontSize: '1.2rem', fontWeight: 500 }}>Pas encore de projets partagés.</p>
+                      <p style={{ color: 'var(--text-dim)', fontSize: '1rem', marginTop: '0.5rem' }}>Commencez à partager vos réalisations pour briller sur la communauté !</p>
                    </div>
                  ) : (
                    <>
                     {projects.map(p => (
-                      <div key={p.id} className="card-premium hover-scale" style={{ padding: '2rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '20px', transition: 'all 0.3s' }}>
-                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                      <div key={p.id} className="card-premium hover-scale" style={{ padding: '2.5rem', background: 'linear-gradient(135deg, rgba(0,217,255,0.05), rgba(139,92,246,0.03))', border: '1px solid rgba(0,217,255,0.2)', borderRadius: '20px', transition: 'all 0.3s' }}>
+                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
                             <div style={{ flex: 1 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                 <span style={{ fontSize: '0.7rem', color: '#06B6D4', background: 'rgba(6, 182, 212, 0.1)', padding: '0.3rem 0.8rem', borderRadius: '8px', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.05em' }}>PROJET TECH</span>
-                                 {p.project_date && <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 600 }}>• {p.project_date}</span>}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                                 <span style={{ fontSize: '0.75rem', color: '#00D9FF', background: 'linear-gradient(135deg, rgba(0,217,255,0.2), rgba(0,217,255,0.1))', padding: '0.5rem 1rem', borderRadius: '10px', textTransform: 'uppercase', fontWeight: 900, letterSpacing: '0.08em', border: '1px solid rgba(0,217,255,0.3)' }}>📌 Projet Tech</span>
+                                 {p.project_date && <span style={{ fontSize: '0.9rem', color: 'var(--text-dim)', fontWeight: 600 }}>• {p.project_date}</span>}
                               </div>
-                              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.8rem', color: 'white' }}>{p.name || p.title}</h3>
-                              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>{p.description}</p>
+                              <h3 style={{ fontSize: '1.7rem', fontWeight: 900, marginBottom: '1rem', color: 'white', background: 'linear-gradient(135deg, #FFFFFF, rgba(0,217,255,0.8))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{p.name || p.title}</h3>
+                              <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '1.1rem', lineHeight: 1.8, marginBottom: '1.5rem' }}>{p.description}</p>
                               
-                              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                 {(p.github_url || p.link) && (
-                                    <button onClick={(e) => openProjectViewer(e, p)} className="btn-outline hover-bright" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.2rem', borderRadius: '12px', fontSize: '0.9rem', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                        <Github size={16}/> Voir Source
+                                    <button onClick={(e) => openProjectViewer(e, p)} className="btn-outline hover-bright" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.8rem 1.5rem', borderRadius: '12px', fontSize: '0.95rem', cursor: 'pointer', background: 'rgba(0,217,255,0.1)', color: 'var(--cyan)', border: '1px solid rgba(0,217,255,0.3)', fontWeight: 600, transition: 'all 0.3s' }}>
+                                        <ExternalLink size={18}/> Voir le Projet
                                     </button>
                                 )}
-                                <a href="#" style={{ color: 'var(--text-dim)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none' }}>
-                                    <MessageSquare size={16}/> {Math.floor(Math.random() * 10)} commentaires
-                                </a>
+                                <button style={{ color: 'var(--text-dim)', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', transition: '0.2s' }} className="hover-bright">
+                                    <MessageSquare size={18}/> {Math.floor(Math.random() * 10)} commentaires
+                                </button>
                                 
                                 {isOwner && (
                                     <button 
                                        onClick={() => setProjectToDelete(p.id)} 
-                                       style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'rgba(239, 68, 68, 0.5)', cursor: 'pointer', transition: '0.2s' }} 
+                                       style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'rgba(239, 68, 68, 0.4)', cursor: 'pointer', transition: '0.2s', padding: '0.5rem' }} 
+                                       className="hover-bright"
                                        title="Supprimer ce projet"
                                     >
-                                        <Trash2 size={18} />
+                                        <Trash2 size={20} />
                                     </button>
                                 )}
                               </div>
@@ -541,63 +551,231 @@ const ProfilePage = () => {
          {/* Sidebar with Advanced Widgets */}
          <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
             {/* Skills Matrix */}
-            <section className="card-premium" style={{ borderRadius: '24px' }}>
-               <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', fontWeight: 800 }}>Compétences <span className="gradient-text">Mastery</span></h3>
-               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+            <section className="card-premium" style={{ borderRadius: '24px', background: 'linear-gradient(135deg, rgba(0,217,255,0.05), rgba(139,92,246,0.05))', border: '1px solid rgba(0,217,255,0.2)' }}>
+               <h3 style={{ fontSize: '1.4rem', marginBottom: '1.8rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                 <div style={{ width: '3px', height: '28px', background: 'linear-gradient(180deg, var(--cyan), #CCFF00)', borderRadius: '2px' }}></div>
+                 Stack <span className="gradient-text">Technique</span>
+               </h3>
+               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem' }}>
                  {(profile.skills || []).length > 0 ? (profile.skills || []).map((skill, index) => (
-                   <span key={index} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.6rem 1.2rem', borderRadius: '14px', fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-main)', transition: '0.2s' }} className="hover-bright">
-                     {skill}
+                   <span key={index} style={{ background: 'linear-gradient(135deg, rgba(0,217,255,0.15), rgba(139,92,246,0.1))', border: '1px solid rgba(0,217,255,0.2)', padding: '0.8rem 1.4rem', borderRadius: '12px', fontSize: '0.95rem', fontWeight: 700, color: 'var(--cyan)', transition: 'all 0.3s', cursor: 'default' }} className="hover-bright" onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                     ✦ {skill}
                    </span>
-                 )) : <span style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>En attente de stack technique...</span>}
+                 )) : <span style={{ color: 'var(--text-dim)', fontSize: '0.95rem', fontStyle: 'italic' }}>Compétences en attente...</span>}
                </div>
             </section>
 
             {/* CV Widget (New) */}
-            <section className="card-premium" style={{ borderRadius: '24px', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), transparent)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-               <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                  <LinkIcon size={20} color="#ef4444" /> Curriculum Vitae
+            <section className="card-premium" style={{ borderRadius: '24px', background: 'linear-gradient(135deg, rgba(0,217,255,0.1), rgba(139,92,246,0.05))', border: '1px solid rgba(0,217,255,0.2)' }}>
+               <h3 style={{ fontSize: '1.3rem', marginBottom: '1.5rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                  <FileText size={20} color="var(--cyan)" /> Curriculum Vitae
                </h3>
                {profile.cv_path ? (
-                 <a href={`/storage/${profile.cv_path}`} target="_blank" rel="noreferrer" className="btn-premium" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: '#ef4444', border: 'none' }}>
-                    Télécharger le CV (PDF)
+                 <a href={`/storage/${profile.cv_path}`} target="_blank" rel="noreferrer" className="btn-premium" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.8rem', background: 'linear-gradient(135deg, var(--cyan), #00D9FF)', border: 'none', fontWeight: 700, padding: '1.2rem' }}>
+                    <Download size={18}/> Télécharger mon CV
                  </a>
                ) : (
-                 <div style={{ textAlign: 'center', padding: '1rem' }}>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-dim)', marginBottom: '1rem' }}>Aucun CV disponible pour ce profil.</p>
-                    {isOwner && <button onClick={() => setEditMode(true)} style={{ background: 'transparent', border: '1px dashed rgba(255,255,255,0.2)', color: 'white', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>Ajouter mon CV</button>}
+                 <div style={{ textAlign: 'center', padding: '1.5rem', borderRadius: '12px', background: 'rgba(0,217,255,0.05)', border: '1px dashed rgba(0,217,255,0.2)' }}>
+                    <p style={{ fontSize: '0.95rem', color: 'var(--text-dim)', marginBottom: '1rem', fontWeight: 500 }}>Aucun CV disponible pour ce profil.</p>
+                    {isOwner && <button onClick={() => setEditMode(true)} style={{ background: 'transparent', border: '1px solid rgba(0,217,255,0.3)', color: 'var(--cyan)', padding: '0.7rem 1.2rem', borderRadius: '10px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600, transition: 'all 0.3s' }} className="hover-bright">Ajouter mon CV</button>}
                  </div>
                )}
             </section>
 
             {/* User Statistics Card */}
-            <section className="card-premium" style={{ borderRadius: '24px', background: 'rgba(255,255,255,0.01)' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', fontWeight: 800 }}>Performance</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Projets Validés</span>
-                        <span style={{ color: 'white', fontWeight: 900 }}>{projects.length}</span>
-                    </div>
-                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px' }}>
-                        <div style={{ width: `${Math.min(projects.length * 20, 100)}%`, height: '100%', background: 'var(--cyan)', borderRadius: '2px', boxShadow: '0 0 10px var(--cyan)' }}></div>
+            <section className="card-premium" style={{ borderRadius: '24px', background: 'linear-gradient(135deg, rgba(0,217,255,0.05), rgba(139,92,246,0.05))', border: '1px solid rgba(139,92,246,0.2)' }}>
+                <h3 style={{ fontSize: '1.3rem', marginBottom: '2rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                  <Award size={22} color="var(--cyan)" /> Performance
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                            <span style={{ color: 'var(--text-dim)', fontWeight: 700, fontSize: '0.95rem' }}>Projets Validés</span>
+                            <span style={{ color: 'var(--cyan)', fontWeight: 900, fontSize: '1.3rem' }}>{projects.length}</span>
+                        </div>
+                        <div style={{ height: '6px', background: 'rgba(0,217,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${Math.min(projects.length * 20, 100)}%`, height: '100%', background: 'linear-gradient(90deg, var(--cyan), #00D9FF)', borderRadius: '3px', boxShadow: '0 0 12px var(--cyan)', transition: 'width 0.3s ease' }}></div>
+                        </div>
                     </div>
                     
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
-                        <span style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Score Communauté</span>
-                        <span style={{ color: '#CCFF00', fontWeight: 900 }}>{profile.points}</span>
-                    </div>
-                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px' }}>
-                        <div style={{ width: `${Math.min(profile.points / 10, 100)}%`, height: '100%', background: '#CCFF00', borderRadius: '2px', boxShadow: '0 0 10px #CCFF00' }}></div>
+                    <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                            <span style={{ color: 'var(--text-dim)', fontWeight: 700, fontSize: '0.95rem' }}>Score Communauté</span>
+                            <span style={{ color: '#CCFF00', fontWeight: 900, fontSize: '1.3rem' }}>{profile.points} pts</span>
+                        </div>
+                        <div style={{ height: '6px', background: 'rgba(204,255,0,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${Math.min(profile.points / 10, 100)}%`, height: '100%', background: 'linear-gradient(90deg, #CCFF00, #00D9FF)', borderRadius: '3px', boxShadow: '0 0 12px #CCFF00', transition: 'width 0.3s ease' }}></div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* Achievements Snippet */}
-            <section className="card-premium" style={{ borderRadius: '24px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), transparent)' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', fontWeight: 800 }}>Badges</h3>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <div title="Pionnier" style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(0,217,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--cyan)' }}><Star size={24}/></div>
-                    <div title="Contributeur Or" style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(204,255,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#CCFF00' }}><Award size={24}/></div>
-                    <div title="Top Développeur" style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(139,92,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA' }}><Briefcase size={24}/></div>
+            <section className="card-premium" style={{ borderRadius: '24px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 217, 255, 0.05))' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '2rem', fontWeight: 800 }}>Badges & Réalisations</h3>
+                
+                {/* Rank & Level Badges */}
+                <div style={{ marginBottom: '2rem' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Niveau & Rang</div>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        <div title="Niveau Expert" style={{ 
+                            padding: '1rem 1.5rem', 
+                            borderRadius: '12px', 
+                            background: 'linear-gradient(135deg, rgba(204,255,0,0.2), rgba(204,255,0,0.05))',
+                            border: '1px solid rgba(204,255,0,0.3)',
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '0.8rem',
+                            color: '#CCFF00',
+                            fontWeight: 600,
+                            fontSize: '0.9rem'
+                        }}>
+                            <Award size={20}/> Expert Level
+                        </div>
+                        <div title="Contributeur Senior" style={{ 
+                            padding: '1rem 1.5rem', 
+                            borderRadius: '12px', 
+                            background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(139,92,246,0.05))',
+                            border: '1px solid rgba(139,92,246,0.3)',
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '0.8rem',
+                            color: '#A78BFA',
+                            fontWeight: 600,
+                            fontSize: '0.9rem'
+                        }}>
+                            <Briefcase size={20}/> Senior Developer
+                        </div>
+                        <div title="Top 10 Classement" style={{ 
+                            padding: '1rem 1.5rem', 
+                            borderRadius: '12px', 
+                            background: 'linear-gradient(135deg, rgba(0,217,255,0.2), rgba(0,217,255,0.05))',
+                            border: '1px solid rgba(0,217,255,0.3)',
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '0.8rem',
+                            color: 'var(--cyan)',
+                            fontWeight: 600,
+                            fontSize: '0.9rem'
+                        }}>
+                            <Star size={20}/> Top 10 Ranking
+                        </div>
+                    </div>
+                </div>
+
+                {/* Achievement Badges */}
+                <div style={{ marginBottom: '2rem' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dim)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Réalisations</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem' }}>
+                        <div title="Pionnier" style={{ 
+                            padding: '1.2rem', 
+                            borderRadius: '16px', 
+                            background: 'linear-gradient(135deg, rgba(0,217,255,0.15), transparent)',
+                            border: '1px solid rgba(0,217,255,0.3)',
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            alignItems: 'center', 
+                            gap: '0.6rem',
+                            color: 'var(--cyan)',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            opacity: 0.8
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.opacity = 1; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.opacity = 0.8; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                            <Star size={28}/>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 700 }}>Pionnier</div>
+                        </div>
+                        
+                        <div title="Contributeur Or" style={{ 
+                            padding: '1.2rem', 
+                            borderRadius: '16px', 
+                            background: 'linear-gradient(135deg, rgba(204,255,0,0.15), transparent)',
+                            border: '1px solid rgba(204,255,0,0.3)',
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            alignItems: 'center', 
+                            gap: '0.6rem',
+                            color: '#CCFF00',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            opacity: 0.8
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.opacity = 1; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.opacity = 0.8; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                            <Award size={28}/>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 700 }}>Contributeur Or</div>
+                        </div>
+                        
+                        <div title="Innovateur" style={{ 
+                            padding: '1.2rem', 
+                            borderRadius: '16px', 
+                            background: 'linear-gradient(135deg, rgba(139,92,246,0.15), transparent)',
+                            border: '1px solid rgba(139,92,246,0.3)',
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            alignItems: 'center', 
+                            gap: '0.6rem',
+                            color: '#A78BFA',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            opacity: 0.8
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.opacity = 1; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.opacity = 0.8; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                            <Briefcase size={28}/>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 700 }}>Innovateur</div>
+                        </div>
+
+                        <div title="Collaborateur" style={{ 
+                            padding: '1.2rem', 
+                            borderRadius: '16px', 
+                            background: 'linear-gradient(135deg, rgba(75, 0, 130, 0.15), transparent)',
+                            border: '1px solid rgba(75, 0, 130, 0.3)',
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            alignItems: 'center', 
+                            gap: '0.6rem',
+                            color: '#8B5CF6',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            opacity: 0.8
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.opacity = 1; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.opacity = 0.8; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                            <MessageSquare size={28}/>
+                            <div style={{ fontSize: '0.8rem', fontWeight: 700 }}>Collaborateur</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Quick Stats */}
+                <div style={{ 
+                    padding: '1.5rem', 
+                    borderRadius: '12px', 
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255,255,255,0.05)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                    gap: '1rem',
+                    textAlign: 'center'
+                }}>
+                    <div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--cyan)' }}>12</div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 500 }}>Projets Complétés</div>
+                    </div>
+                    <div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#CCFF00' }}>847</div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 500 }}>Points Communauté</div>
+                    </div>
+                    <div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#A78BFA' }}>45</div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 500 }}>Followers</div>
+                    </div>
                 </div>
             </section>
          </div>

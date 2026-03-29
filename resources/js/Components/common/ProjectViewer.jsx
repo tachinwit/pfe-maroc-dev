@@ -43,7 +43,7 @@ const ProjectViewer = ({ project, isOpen, onClose }) => {
 
       setContent({
         readme: repoInfo.readme || 'Pas de README disponible',
-        repo: {
+        repoDetails: {
           stargazers_count: repoInfo.stars || 0,
           forks_count: repoInfo.forks || 0,
           updated_at: repoInfo.updated_at || new Date().toISOString(),
@@ -63,20 +63,20 @@ const ProjectViewer = ({ project, isOpen, onClose }) => {
   const renderReadme = () => {
     if (!content?.readme) return null;
 
-    // Conversion basique Markdown vers HTML (simplifiée)
+    // Conversion basique Markdown vers HTML avec styles thème sombre
     const htmlContent = content.readme
-      .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mb-4">$1</h1>')
-      .replace(/^## (.+)$/gm, '<h2 class="text-xl font-semibold mb-3 mt-6">$1</h2>')
-      .replace(/^### (.+)$/gm, '<h3 class="text-lg font-medium mb-2 mt-4">$1</h3>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/`(.+?)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>')
-      .replace(/\n\n/g, '</p><p class="mb-4">')
+      .replace(/^# (.+)$/gm, '<h1 class="text-3xl font-bold mb-6 text-cyan-400">$1</h1>')
+      .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-semibold mb-4 mt-8 text-cyan-300">$1</h2>')
+      .replace(/^### (.+)$/gm, '<h3 class="text-xl font-medium mb-3 mt-6 text-indigo-400">$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em class="text-gray-300 italic">$1</em>')
+      .replace(/`(.+?)`/g, '<code class="bg-gray-900 px-2 py-1 rounded text-sm font-mono text-lime-400">$1</code>')
+      .replace(/\n\n/g, '</p><p class="mb-4 text-gray-300">')
       .replace(/\n/g, '<br>');
 
     return (
-      <div className="prose prose-sm max-w-none">
-        <div dangerouslySetInnerHTML={{ __html: `<p class="mb-4">${htmlContent}</p>` }} />
+      <div className="prose prose-invert max-w-none">
+        <div dangerouslySetInnerHTML={{ __html: `<p class="mb-4 text-gray-300">${htmlContent}</p>` }} />
       </div>
     );
   };
@@ -87,32 +87,32 @@ const ProjectViewer = ({ project, isOpen, onClose }) => {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Structure du projet</h3>
+          <h3 className="text-lg font-semibold text-white">Structure du projet</h3>
           <button
             onClick={() => setShowRaw(!showRaw)}
-            className="flex items-center gap-2 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
+            className="flex items-center gap-2 px-3 py-1 text-sm bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/30 rounded transition-all"
           >
             {showRaw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             {showRaw ? 'Masquer' : 'Voir'} brut
           </button>
         </div>
 
-        <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+        <div className="bg-gray-950 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto border border-gray-700/50">
           {content.contents.map((item, index) => (
             <div key={index} className="mb-1">
               {item.type === 'dir' ? (
-                <span className="text-blue-400">📁 {item.name}/</span>
+                <span className="text-blue-300">📁 {item.name}/</span>
               ) : (
-                <span className="text-gray-300">📄 {item.name}</span>
+                <span className="text-gray-400">📄 {item.name}</span>
               )}
             </div>
           ))}
         </div>
 
         {showRaw && (
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <h4 className="font-semibold mb-2">Contenu brut (JSON)</h4>
-            <pre className="text-xs overflow-x-auto">
+          <div className="bg-gray-900/50 border border-gray-700/50 p-4 rounded-lg">
+            <h4 className="font-semibold mb-2 text-gray-300">Contenu brut (JSON)</h4>
+            <pre className="text-xs overflow-x-auto text-gray-400">
               {JSON.stringify(content.contents, null, 2)}
             </pre>
           </div>
@@ -124,22 +124,24 @@ const ProjectViewer = ({ project, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-[9999] overflow-hidden flex items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black bg-opacity-70 backdrop-blur-sm" onClick={onClose} />
 
-      {/* Modal/Slide-over */}
-      <div className="absolute right-0 top-0 h-full w-full max-w-4xl bg-white shadow-xl transform transition-transform">
+      {/* Modal/Slide-over - Centré */}
+      <div className="relative z-[10000] w-full max-w-4xl h-full max-h-[90vh] mx-auto bg-gradient-to-br from-blue-950/40 to-indigo-950/40 backdrop-blur-xl border border-cyan-500/20 shadow-2xl rounded-xl overflow-hidden">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-cyan-900/40 bg-gradient-to-r from-blue-950/50 to-indigo-950/50 backdrop-blur">
             <div className="flex items-center gap-3">
-              <Github className="w-6 h-6 text-gray-700" />
+              <div className="p-2 bg-cyan-500/20 rounded-lg">
+                <Github className="w-5 h-5 text-cyan-400" />
+              </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-lg font-bold text-white">
                   {project?.title || 'Projet GitHub'}
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs text-gray-400 mt-1">
                   {content?.repo?.description || 'Visionneuse intégrée'}
                 </p>
               </div>
@@ -150,16 +152,16 @@ const ProjectViewer = ({ project, isOpen, onClose }) => {
                 href={project?.github_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-sm bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-400 border border-cyan-500/30 rounded-lg transition-all duration-300"
               >
                 <ExternalLink className="w-4 h-4" />
-                Voir sur GitHub
+                GitHub
               </a>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-700/40 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-gray-400 hover:text-white" />
               </button>
             </div>
           </div>
@@ -168,21 +170,21 @@ const ProjectViewer = ({ project, isOpen, onClose }) => {
           <div className="flex-1 overflow-hidden">
             {loading ? (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-3 text-gray-600">Chargement du projet...</span>
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-cyan-500/30 border-t-cyan-400"></div>
+                <span className="ml-3 text-gray-400">Chargement du projet...</span>
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                <div className="text-red-500 mb-4">
+                <div className="text-red-500/60 mb-4">
                   <FileText className="w-12 h-12 mx-auto" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-gray-300 mb-2">
                   Erreur de chargement
                 </h3>
-                <p className="text-gray-600 mb-4">{error}</p>
+                <p className="text-gray-400 mb-4">{error}</p>
                 <button
                   onClick={loadProjectContent}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition-colors"
                 >
                   Réessayer
                 </button>
@@ -190,33 +192,33 @@ const ProjectViewer = ({ project, isOpen, onClose }) => {
             ) : (
               <div className="h-full flex flex-col">
                 {/* Tabs */}
-                <div className="flex border-b border-gray-200">
+                <div className="flex border-b border-cyan-900/30 bg-blue-950/20 backdrop-blur px-6">
                   <button
                     onClick={() => setActiveTab('readme')}
-                    className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+                    className={`px-4 py-3 font-medium text-sm border-b-2 transition-all duration-300 flex items-center gap-2 ${
                       activeTab === 'readme'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                        ? 'border-cyan-500 text-cyan-400'
+                        : 'border-transparent text-gray-500 hover:text-gray-400'
                     }`}
                   >
-                    <FileText className="w-4 h-4 inline mr-2" />
+                    <FileText className="w-4 h-4" />
                     README
                   </button>
                   <button
                     onClick={() => setActiveTab('code')}
-                    className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+                    className={`px-4 py-3 font-medium text-sm border-b-2 transition-all duration-300 flex items-center gap-2 ${
                       activeTab === 'code'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                        ? 'border-cyan-500 text-cyan-400'
+                        : 'border-transparent text-gray-500 hover:text-gray-400'
                     }`}
                   >
-                    <Code className="w-4 h-4 inline mr-2" />
+                    <Code className="w-4 h-4" />
                     Structure
                   </button>
                 </div>
 
                 {/* Tab Content */}
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-6 space-y-4">
                   {activeTab === 'readme' && renderReadme()}
                   {activeTab === 'code' && renderCodeView()}
                 </div>
@@ -225,16 +227,16 @@ const ProjectViewer = ({ project, isOpen, onClose }) => {
           </div>
 
           {/* Footer avec stats du repo */}
-          {content?.repo && (
-            <div className="border-t border-gray-200 p-4 bg-gray-50">
-              <div className="flex items-center justify-between text-sm text-gray-600">
-                <div className="flex items-center gap-4">
-                  <span>⭐ {content.repo.stargazers_count} stars</span>
-                  <span>🍴 {content.repo.forks_count} forks</span>
-                  <span>📅 {new Date(content.repo.updated_at).toLocaleDateString()}</span>
+          {content?.repoDetails && (
+            <div className="border-t border-cyan-900/40 p-4 bg-blue-950/30 backdrop-blur">
+              <div className="flex items-center justify-between text-sm text-gray-400">
+                <div className="flex items-center gap-6">
+                  <span className="flex items-center gap-2"><span className="text-yellow-500">⭐</span> {content.repoDetails.stargazers_count} stars</span>
+                  <span className="flex items-center gap-2"><span className="text-purple-400">🍴</span> {content.repoDetails.forks_count} forks</span>
+                  <span className="flex items-center gap-2"><span className="text-cyan-400">📅</span> {new Date(content.repoDetails.updated_at).toLocaleDateString('fr-FR')}</span>
                 </div>
-                <span className="text-xs">
-                  Données fournies par l'API GitHub
+                <span className="text-xs text-gray-500">
+                  API GitHub
                 </span>
               </div>
             </div>
