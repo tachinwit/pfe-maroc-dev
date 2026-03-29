@@ -159,6 +159,7 @@ class GitHubService
             'homepage'    => $data['homepage'] ?? null,
             'topics'      => $data['topics'] ?? [],
             'readme'      => $readme,
+            'updated_at'  => $data['updated_at'] ?? null,
         ];
     }
 }

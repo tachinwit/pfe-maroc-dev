@@ -28,16 +28,29 @@ class VoteController extends Controller
                     ->where('votable_type', $modelClass)
                     ->first();
 
+        $previousVoteType = $vote ? $vote->type : null;
+
         // LOGIC: Every click only changes the score by 1.
         // If they click the SAME vote type they have, remove it.
         if ($vote && $vote->type == $request->vote_type) {
             $vote->delete();
+            // Retirer les points si c'était un upvote
+            if ($request->vote_type == 1) {
+                $model->user->penalizeForDownvote(); // -2 points pour retirer l'upvote
+            }
             return redirect()->back()->with('info', 'Vote retiré.');
         }
 
         // If they click the OPPOSITE vote type, also remove it (goes back to 0).
         if ($vote && $vote->type != $request->vote_type) {
             $vote->delete();
+            // Ajuster les points selon le changement
+            if ($previousVoteType == 1) {
+                $model->user->penalizeForDownvote(); // Retirer l'ancien upvote
+            }
+            if ($request->vote_type == 1) {
+                $model->user->rewardForUpvote(); // Ajouter le nouvel upvote
+            }
             return redirect()->back()->with('info', 'Vote réinitialisé.');
         }
 
@@ -49,8 +62,12 @@ class VoteController extends Controller
             'type' => $request->vote_type,
         ]);
 
-        // No points awarded for participation to prevent abuse
-        // $request->user()->addPoints(2);
+        // Gamification Anti-Spam: Points uniquement pour contenu utile
+        if ($request->vote_type == 1) {
+            $model->user->rewardForUpvote(); // +5 points pour upvote reçu
+        } elseif ($request->vote_type == -1) {
+            $model->user->penalizeForDownvote(); // -2 points pour downvote reçu
+        }
 
         // Notify author if upvoted
         if ($request->vote_type == 1 && $model->user) {

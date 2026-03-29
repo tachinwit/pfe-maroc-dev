@@ -4,6 +4,7 @@ import { Link, usePage, Head, router } from '@inertiajs/react';
 import MainLayout from '../Layouts/MainLayout';
 import Toast from '../Components/common/Toast';
 import GithubPreviewModal from '../Components/common/GithubPreviewModal';
+import ProjectViewer from '../Components/common/ProjectViewer';
 import { SKILLS_LIST, ALL_SKILLS } from '../Constants/skills';
 
 const ProfilePage = () => {
@@ -29,6 +30,7 @@ const ProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
   const [addProjectMode, setAddProjectMode] = useState(false);
   const [githubPreviewUrl, setGithubPreviewUrl] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [addType, setAddType] = useState('manual'); // 'manual' or 'github'
   const [isImporting, setIsImporting] = useState(false);
@@ -118,7 +120,7 @@ const ProfilePage = () => {
     }
     setIsImporting(true);
     router.post('/projects/github', {
-        url: projectForm.link
+        github_url: projectForm.link
     }, {
         onSuccess: () => {
             setIsImporting(false);
@@ -126,9 +128,9 @@ const ProfilePage = () => {
             setProjectForm({ title: '', description: '', link: '', type: 'Project', date: '' });
             setToast({ message: 'Projet importé avec succès depuis GitHub !', points: null });
         },
-        onError: () => {
+        onError: (errors) => {
             setIsImporting(false);
-            setToast({ message: "Échec de l'importation. Vérifiez l'URL.", points: null });
+            setToast({ message: errors.github_url || "Échec de l'importation. Vérifiez l'URL.", points: null, type: 'error' });
         }
     });
   };
@@ -143,12 +145,12 @@ const ProfilePage = () => {
     });
   };
 
-  const openGithubPreview = (e, url) => {
+  const openProjectViewer = (e, project) => {
     if (e) {
         e.preventDefault();
         e.stopPropagation();
     }
-    setGithubPreviewUrl(url);
+    setSelectedProject(project);
   };
 
   return (
@@ -346,6 +348,11 @@ const ProfilePage = () => {
 
       {/* GitHub Preview Modal */}
       <GithubPreviewModal url={githubPreviewUrl} onClose={() => setGithubPreviewUrl(null)} />
+      <ProjectViewer
+        project={selectedProject}
+        isOpen={!!selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
 
       {/* Delete Confirmation Modal */}
       {projectToDelete && (
@@ -418,7 +425,7 @@ const ProfilePage = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '0.8rem' }}>
-                  <button onClick={(e) => openGithubPreview(e, profile.github_url || 'https://github.com/mohssinebaraou')} className="hover-scale" style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }}><Github size={22}/></button>
+                  <button onClick={(e) => openProjectViewer(e, { title: 'Profil GitHub', github_url: profile.github_url || 'https://github.com/mohssinebaraou' })} className="hover-scale" style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }}><Github size={22}/></button>
                   <a href={profile.linkedin_url || "#"} target={profile.linkedin_url ? "_blank" : "_self"} className="hover-scale" style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0A66C2', border: '1px solid rgba(255,255,255,0.1)' }}><Linkedin size={22}/></a>
               </div>
            </div>
@@ -473,7 +480,7 @@ const ProfilePage = () => {
                               
                               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                 {(p.github_url || p.link) && (
-                                    <button onClick={(e) => openGithubPreview(e, p.github_url || p.link)} className="btn-outline hover-bright" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.2rem', borderRadius: '12px', fontSize: '0.9rem', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <button onClick={(e) => openProjectViewer(e, p)} className="btn-outline hover-bright" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.2rem', borderRadius: '12px', fontSize: '0.9rem', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
                                         <Github size={16}/> Voir Source
                                     </button>
                                 )}
@@ -509,7 +516,7 @@ const ProfilePage = () => {
                          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1rem', marginBottom: '1.5rem' }}>{c.description || 'Contribution active aux échanges communautaires.'}</p>
                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             {(c.github_url || c.link) && (
-                               <button onClick={(e) => openGithubPreview(e, c.github_url || c.link)} style={{ color: 'var(--cyan)', fontWeight: 700, fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+                               <button onClick={(e) => openProjectViewer(e, c)} style={{ color: 'var(--cyan)', fontWeight: 700, fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
                                    <LinkIcon size={16}/> Consulter la publication
                                </button>
                             )}

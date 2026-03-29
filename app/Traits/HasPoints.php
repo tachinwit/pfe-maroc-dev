@@ -5,10 +5,14 @@ namespace App\Traits;
 use App\Traits\PointsConfig;
 
 /**
- * Trait HasPoints
- * 
- * Gère la logique de réputation/gamification pour les utilisateurs.
- * Usage : ajouter `use HasPoints;` dans le modèle User.php
+ * Trait HasPoints - Gamification Anti-Spam
+ *
+ * Nouveau système : Points uniquement pour contenu utile
+ * - +5 points par vote positif reçu
+ * - +20 points si commentaire marqué comme Best Answer
+ * - -2 points par vote négatif reçu
+ *
+ * Supprimé : Gains automatiques pour posts/comments et IA
  */
 trait HasPoints
 {
@@ -30,27 +34,27 @@ trait HasPoints
     }
 
     /**
-     * +10 points : Nouveau post sur le forum
+     * +5 points : Vote positif reçu sur son contenu
      */
-    public function rewardForForumPost(): void
+    public function rewardForUpvote(): void
     {
-        $this->addPoints(PointsConfig::FORUM_POST);
+        $this->addPoints(PointsConfig::UPVOTE_RECEIVED);
     }
 
     /**
-     * +20 points : Partage d'un projet
+     * -2 points : Vote négatif reçu sur son contenu
      */
-    public function rewardForProjectShare(): void
+    public function penalizeForDownvote(): void
     {
-        $this->addPoints(PointsConfig::PROJECT_SHARE);
+        $this->removePoints(PointsConfig::DOWNVOTE_RECEIVED);
     }
 
     /**
-     * +5 points : Interaction avec l'Assistant IA
+     * +20 points : Commentaire marqué comme Best Answer
      */
-    public function rewardForAiInteraction(): void
+    public function rewardForBestAnswer(): void
     {
-        $this->addPoints(PointsConfig::AI_INTERACTION);
+        $this->addPoints(PointsConfig::BEST_ANSWER);
     }
 
     /**

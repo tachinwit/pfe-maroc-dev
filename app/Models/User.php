@@ -31,6 +31,9 @@ class User extends Authenticatable
         'cv_path',
         'github_url',
         'linkedin_url',
+        'google_id',
+        'avatar',
+        'email_verified_at',
     ];
 
     /**

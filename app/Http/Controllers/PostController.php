@@ -109,12 +109,14 @@ class PostController extends Controller
 
         $comment->update(['is_best_answer' => true]);
 
+        // Gamification Anti-Spam: +20 points pour Best Answer
         if ($comment->user) {
-            // $comment->user->addPoints(\App\Traits\PointsConfig::BEST_ANSWER);
+            $comment->user->rewardForBestAnswer();
         }
 
         return redirect()->back()->with([
             'success' => 'Marqué comme meilleure réponse !',
+            'points' => '+20 points pour la meilleure réponse'
         ]);
     }
 }

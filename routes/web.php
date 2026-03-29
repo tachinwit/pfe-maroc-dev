@@ -117,6 +117,23 @@ Route::get('/developers', function () {
 })->name('developers');
 
 // Auth protected routes
+// Route publique pour charger les infos GitHub (avec rate limit backend)
+Route::get('/api/github/repo-info', function (\Illuminate\Http\Request $request) {
+    $url = $request->query('url');
+    
+    if (!$url) {
+        return response()->json(['error' => 'URL manquante'], 400);
+    }
+
+    try {
+        $githubService = app(\App\Services\GitHubService::class);
+        $repoInfo = $githubService->getRepoInfo($url);
+        return response()->json($repoInfo);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 400);
+    }
+});
+
 Route::middleware('auth')->group(function () {
     Route::post('/events/create', [\App\Http\Controllers\EventController::class, 'store'])->name('events.create');
     Route::delete('/events/{id}', [\App\Http\Controllers\EventController::class, 'destroy'])->name('events.destroy');
@@ -147,8 +164,9 @@ Route::middleware('auth')->group(function () {
         $event->participants()->attach($user->id);
         $event->increment('attendees_count');
         
-        $user->addPoints(20);
-        return redirect()->back()->with('success', 'Inscription confirmée ! (+20 pts)');
+        // Gamification Anti-Spam: Plus de points automatiques pour participation
+        // $user->addPoints(20); // Désactivé pour prévenir le farming
+        return redirect()->back()->with('success', 'Inscription confirmée !');
     })->name('events.participate');
     
     Route::get('/events/{id}/receipt', [\App\Http\Controllers\EventController::class, 'downloadReceipt'])->name('events.receipt');

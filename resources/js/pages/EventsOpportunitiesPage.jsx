@@ -61,7 +61,7 @@ const EventsOpportunitiesPage = () => {
           preserveScroll: true,
           onSuccess: (page) => {
               if (page.props.flash?.success) {
-                  setLocalToast({ message: page.props.flash.success, points: '+20 pts' });
+                  setLocalToast({ message: page.props.flash.success, points: null });
               } else if (page.props.flash?.info) {
                   setLocalToast({ message: page.props.flash.info, points: null });
               }
@@ -111,10 +111,14 @@ const EventsOpportunitiesPage = () => {
       e.preventDefault();
       postOpp('/opportunities/create', {
           preserveScroll: true,
-          onSuccess: () => {
+          onSuccess: (page) => {
+              if (page.props.flash?.error) {
+                  setLocalToast({ message: page.props.flash.error, type: 'error', points: null });
+                  return;
+              }
               setShowCreateOppModal(false);
               resetOppForm();
-              setLocalToast({ message: 'Opportunité créée avec succès !', points: null });
+              setLocalToast({ message: page.props.flash?.success || 'Opportunité créée avec succès !', points: null });
           },
           onError: (errors) => {
               console.error("Erreur création opportunité:", errors);

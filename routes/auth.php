@@ -1,5 +1,6 @@
 <?php
 
+use Inertia\Inertia;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\SocialiteController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -33,6 +35,10 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    // Socialite Google OAuth routes
+    Route::get('auth/google', [SocialiteController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('auth/google/callback', [SocialiteController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 
 Route::middleware('auth')->group(function () {
@@ -56,4 +62,28 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+});
+
+// OTP Verification routes (accessible pendant le processus d'authentification)
+Route::middleware('web')->group(function () {
+    Route::get('auth/verify-otp', function () {
+        // Si déjà connecté, rediriger vers dashboard
+        if (auth()->check()) {
+            return redirect('/dashboard');
+        }
+
+        // Récupérer les données flash de la session
+        $email = session('email');
+        $message = session('message');
+        $debugOtp = session('debug_otp');
+
+        return Inertia::render('Auth/VerifyOtp', [
+            'email' => $email,
+            'message' => $message,
+            'debug_otp' => $debugOtp,
+        ]);
+    })->name('auth.verify-otp');
+
+    Route::post('auth/verify-otp', [SocialiteController::class, 'verifyOtp']);
+    Route::post('auth/resend-otp', [SocialiteController::class, 'resendOtp']);
 });

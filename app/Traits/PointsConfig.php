@@ -3,13 +3,18 @@
 namespace App\Traits;
 
 /**
- * Centralise les valeurs de points pour faciliter la maintenance.
- * Modifiez ces constantes pour ajuster la balance du jeu.
+ * Configuration des points - Système Anti-Spam
+ *
+ * Points uniquement pour contenu utile et engagement positif
  */
 class PointsConfig
 {
-    const FORUM_POST     = 0;   // Nouveau post sur le forum
-    const PROJECT_SHARE  = 5;   // Partage d'un projet
-    const AI_INTERACTION = 0;   // Interaction avec l'Assistant IA
-    const BEST_ANSWER    = 10;  // Meilleure réponse choisie
+    const UPVOTE_RECEIVED = 5;   // Vote positif reçu
+    const DOWNVOTE_RECEIVED = 2; // Pénalité pour vote négatif reçu
+    const BEST_ANSWER = 20;      // Commentaire marqué comme meilleure réponse
+
+    // Anciens gains désactivés pour prévention du farming
+    const FORUM_POST = 0;        // Plus de points automatiques pour posts
+    const PROJECT_SHARE = 0;     // Plus de points automatiques pour projets
+    const AI_INTERACTION = 0;    // Plus de points pour IA (prévention farming)
 }

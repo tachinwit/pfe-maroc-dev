@@ -24,6 +24,18 @@ class OpportunityController extends Controller
             'salary' => 'nullable|string|max:255',
         ]);
 
+        // Protection contre les doublons : entreprise + titre + type (30 jours)
+        $thirtyDaysAgo = now()->subDays(30);
+        $exists = Opportunity::where('company', $request->company)
+            ->where('title', $request->title)
+            ->where('type', $request->type)
+            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()->with('error', 'Une opportunité similaire (même entreprise, titre et type) a été publiée dans les 30 derniers jours.');
+        }
+
         Opportunity::create([
             'user_id' => $request->user()->id,
             'title' => $request->title,
